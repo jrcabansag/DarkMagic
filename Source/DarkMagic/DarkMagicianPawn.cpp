@@ -2,7 +2,6 @@
 
 
 #include "DarkMagicianPawn.h"
-#include "BattleGameMode.h"
 
 // Sets default values
 ADarkMagicianPawn::ADarkMagicianPawn()
@@ -18,9 +17,7 @@ ADarkMagicianPawn::ADarkMagicianPawn()
 void ADarkMagicianPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
-	UE_LOG(LogTemp, Warning, TEXT("DARK MAGICIAN PAWN SPAWNED 3!"));
-	
+	battleGameMode = (ABattleGameMode*)(GetWorld()->GetAuthGameMode());
 }
 
 // Called every frame
@@ -33,13 +30,25 @@ void ADarkMagicianPawn::Tick(float DeltaTime)
 void ADarkMagicianPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	UE_LOG(LogTemp, Warning, TEXT("DARK MAGICIAN PAWN SET INPUT!"));
-	PlayerInputComponent->BindAction("Up", IE_Pressed, this, &ADarkMagicianPawn::Jump);
+	PlayerInputComponent->BindAction("Up", IE_Pressed, this, &ADarkMagicianPawn::Up);
+	PlayerInputComponent->BindAction("Down", IE_Pressed, this, &ADarkMagicianPawn::Down);
+	PlayerInputComponent->BindAction("Left", IE_Pressed, this, &ADarkMagicianPawn::Left);
+	PlayerInputComponent->BindAction("Right", IE_Pressed, this, &ADarkMagicianPawn::Right);
 }
 
-void ADarkMagicianPawn::Jump() {
-	ABattleGameMode* battleGameMode = Cast<ABattleGameMode>(GetWorld()->GetAuthGameMode());
-	battleGameMode->AddArrows("UP");
-	UE_LOG(LogTemp, Warning, TEXT("JUMPED!"));
+void ADarkMagicianPawn::Up() {
+	battleGameMode->AddArrow(0);
+}
+
+void ADarkMagicianPawn::Down() {
+	battleGameMode->AddArrow(1);
+}
+
+void ADarkMagicianPawn::Left() {
+	battleGameMode->AddArrow(2);
+}
+
+void ADarkMagicianPawn::Right() {
+	battleGameMode->AddArrow(3);
 }
 

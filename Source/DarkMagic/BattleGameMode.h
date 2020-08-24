@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Components/HorizontalBox.h"
+#include "Components/Image.h"
+#include "Containers/Array.h"
 #include "BattleGameMode.generated.h"
 
-class UUserWidget;
 /**
  * 
  */
@@ -16,13 +18,11 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 	GENERATED_BODY()
 	
 	virtual void StartPlay() override;
-
-	FString arrows;
+	const TArray<const wchar_t*> arrowTexturesReferences = {TEXT("/Game/Images/UpArrow.UpArrow"), TEXT("/Game/Images/DownArrow.DownArrow"), TEXT("/Game/Images/LeftArrow.LeftArrow") , TEXT("/Game/Images/RightArrow.RightArrow") };
+	TArray<UTexture2D*> arrowTextures;
 public:
-	void AddArrows(FString newArrows);
-
-	class UUserWidget* battleWidget;
-
-	UFUNCTION(BlueprintPure, Category = "Health")
-	FText GetArrows() const;
+	void LoadArrowTextures();
+	void LoadArrowBox();
+	void AddArrow(int arrowIndex);
+	UHorizontalBox* arrowBox;
 };

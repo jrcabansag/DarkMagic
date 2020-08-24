@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "BattleGameMode.h"
 #include "DarkMagicianPawn.generated.h"
 
 UCLASS()
@@ -26,6 +27,11 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	void Jump();
+	void Up();
+	void Down();
+	void Left();
+	void Right();
 
+private:
+	ABattleGameMode* battleGameMode;
 };
