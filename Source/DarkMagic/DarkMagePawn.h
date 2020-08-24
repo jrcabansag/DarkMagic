@@ -5,16 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "BattleGameMode.h"
-#include "DarkMagicianPawn.generated.h"
+#include "DarkMagePawn.generated.h"
 
 UCLASS()
-class DARKMAGIC_API ADarkMagicianPawn : public APawn
+class DARKMAGIC_API ADarkMagePawn : public APawn
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	ADarkMagicianPawn();
+	ADarkMagePawn();
 
 protected:
 	// Called when the game starts or when spawned
