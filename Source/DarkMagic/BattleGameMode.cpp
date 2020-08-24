@@ -76,9 +76,12 @@ void ABattleGameMode::PressedArrow(int arrowIndex) {
                 arrowCommandImages[currentArrowCommandIndex]->SetBrushFromTexture(arrowPressedTextures[arrowIndex]);
                 currentArrowCommandIndex++;
             }
+            else {
+                IncorrectArrowPressed();
+            }
         }
         if (currentArrowCommandIndex >= ARROW_COMMANDS_SIZE) {
-            ResetArrowCommands();
+            GetWorld()->GetTimerManager().SetTimer(resetArrowTimerHandle, this, &ABattleGameMode::ResetArrowCommands, RESET_ARROW_TIMER_DURATION, false);
         }
     }
 }
@@ -90,6 +93,15 @@ void ABattleGameMode::ResetArrowCommands() {
         UTexture2D* arrowTexture = arrowTextures[arrowIndex];
         AdjustImageToTexture(arrowImage, arrowTexture);
         arrowCommands[x] = arrowIndex;
+    }
+    currentArrowCommandIndex = 0;
+}
+
+void ABattleGameMode::IncorrectArrowPressed() {
+    for (int x = currentArrowCommandIndex-1; x >= 0; x--) {
+        UImage* arrowImage = arrowCommandImages[x];
+        UTexture2D* arrowTexture = arrowTextures[arrowCommands[x]];
+        AdjustImageToTexture(arrowImage, arrowTexture);
     }
     currentArrowCommandIndex = 0;
 }
