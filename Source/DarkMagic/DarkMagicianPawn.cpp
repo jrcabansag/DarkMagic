@@ -37,18 +37,18 @@ void ADarkMagicianPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 }
 
 void ADarkMagicianPawn::Up() {
-	battleGameMode->AddArrow(0);
+	battleGameMode->PressedArrow(0);
 }
 
 void ADarkMagicianPawn::Down() {
-	battleGameMode->AddArrow(1);
+	battleGameMode->PressedArrow(1);
 }
 
 void ADarkMagicianPawn::Left() {
-	battleGameMode->AddArrow(2);
+	battleGameMode->PressedArrow(2);
 }
 
 void ADarkMagicianPawn::Right() {
-	battleGameMode->AddArrow(3);
+	battleGameMode->PressedArrow(3);
 }
 
