@@ -14,7 +14,7 @@ void ABattleGameMode::StartPlay()
     Super::StartPlay();
     InitArrowTextures();
     InitArrowBox();
-    InitArrowCommands();
+    SetUpArrowCommands(true);
 }
 
 void ABattleGameMode::InitArrowBox() {
@@ -32,31 +32,34 @@ void ABattleGameMode::InitArrowBox() {
 void ABattleGameMode::InitArrowTextures() {
     for (int x = 0; x < ARROW_TEXTURES_REFERENCES.Num(); x++) {
         arrowTextures.Add(LoadObject<UTexture2D>(NULL, ARROW_TEXTURES_REFERENCES[x], NULL, LOAD_None, NULL));
+    }
+    for (int x = 0; x < ARROW_PRESSED_TEXTURES_REFERENCES.Num(); x++) {
         arrowPressedTextures.Add(LoadObject<UTexture2D>(NULL, ARROW_PRESSED_TEXTURES_REFERENCES[x], NULL, LOAD_None, NULL));
     }
 }
 
-void ABattleGameMode::InitArrowCommands() {
-    for (int x = 0; x < ARROW_COMMANDS_SIZE; x++) {
-        int arrowIndex = FMath::RandRange(0, ARROW_TEXTURES_REFERENCES.Num() - 1);
-        UImage* arrowImage = InitArrowImage(arrowIndex);
-        AddArrowImageToBox(arrowImage);
-        arrowCommands.Add(arrowIndex);
-        arrowCommandImages.Add(arrowImage);
-    }
-}
+//void ABattleGameMode::InitArrowCommands() {
+//    for (int x = 0; x < ARROW_COMMANDS_SIZE; x++) {
+//        int arrowIndex = x == ARROW_COMMANDS_SIZE-1 ? 
+//            ARROW_TEXTURES_REFERENCES.Num() : FMath::RandRange(0, ARROW_PRESSED_TEXTURES_REFERENCES.Num() - 1);
+//        UImage* arrowImage = InitArrowImage(arrowIndex);
+//        AddArrowImageToBox(arrowImage);
+//        arrowCommands.Add(arrowIndex);
+//        arrowCommandImages.Add(arrowImage);
+//    }
+//}
 
 UImage* ABattleGameMode::InitArrowImage(int arrowIndex) {
     UTexture2D* arrowTexture = arrowTextures[arrowIndex];
     UImage* arrowImage = NewObject<UImage>(UImage::StaticClass());
+    FVector2D arrowDimensions = FVector2D(arrowTexture->GetSizeX() / 2, arrowTexture->GetSizeY() / 2);
+    arrowImage->SetVisibility(ESlateVisibility::Visible);
+    arrowImage->SetBrushSize(arrowDimensions);
     AdjustImageToTexture(arrowImage, arrowTexture);
     return arrowImage;
 }
 
 void ABattleGameMode::AdjustImageToTexture(UImage* arrowImage, UTexture2D* arrowTexture) {
-    FVector2D arrowDimensions = FVector2D(arrowTexture->GetSizeX() / 2, arrowTexture->GetSizeY() / 2);
-    arrowImage->SetBrushSize(arrowDimensions);
-    arrowImage->SetVisibility(ESlateVisibility::Visible);
     arrowImage->SetBrushFromTexture(arrowTexture);
 }
 
@@ -72,27 +75,41 @@ void ABattleGameMode::AddArrowImageToBox(UImage* arrowImage) {
 void ABattleGameMode::PressedArrow(int arrowIndex) {
     if (arrowBox != nullptr) {
         if (currentArrowCommandIndex < ARROW_COMMANDS_SIZE) {
-            if (arrowCommands[currentArrowCommandIndex] == arrowIndex) {
-                arrowCommandImages[currentArrowCommandIndex]->SetBrushFromTexture(arrowPressedTextures[arrowIndex]);
+            int correctArrowCommand = arrowCommands[currentArrowCommandIndex];
+            bool isWildcard = correctArrowCommand == ARROW_TEXTURES_REFERENCES.Num()-1;
+            if (isWildcard || correctArrowCommand == arrowIndex) {
+                UImage* arrowImage = arrowCommandImages[currentArrowCommandIndex];
+                UTexture2D* arrowTexture = arrowPressedTextures[arrowIndex];
+                AdjustImageToTexture(arrowImage, arrowTexture);
                 currentArrowCommandIndex++;
-            }
-            else {
+            } else {
                 IncorrectArrowPressed();
             }
         }
         if (currentArrowCommandIndex >= ARROW_COMMANDS_SIZE) {
-            GetWorld()->GetTimerManager().SetTimer(resetArrowTimerHandle, this, &ABattleGameMode::ResetArrowCommands, RESET_ARROW_TIMER_DURATION, false);
+            FTimerDelegate resetArrowTimerDelegate = FTimerDelegate::CreateUObject(this, &ABattleGameMode::SetUpArrowCommands, false);
+            GetWorld()->GetTimerManager().SetTimer(resetArrowTimerHandle, resetArrowTimerDelegate, RESET_ARROW_TIMER_DURATION, false);
         }
     }
 }
 
-void ABattleGameMode::ResetArrowCommands() {
+void ABattleGameMode::SetUpArrowCommands(bool initiateArrowImages) {
     for (int x = 0; x < ARROW_COMMANDS_SIZE; x++) {
-        int arrowIndex = FMath::RandRange(0, ARROW_TEXTURES_REFERENCES.Num() - 1);
-        UImage* arrowImage = arrowCommandImages[x];
-        UTexture2D* arrowTexture = arrowTextures[arrowIndex];
-        AdjustImageToTexture(arrowImage, arrowTexture);
-        arrowCommands[x] = arrowIndex;
+        int arrowIndex = x == 0 ?
+            ARROW_TEXTURES_REFERENCES.Num()-1 : FMath::RandRange(0, ARROW_PRESSED_TEXTURES_REFERENCES.Num() - 1);
+        //int arrowIndex = FMath::RandRange(0, ARROW_PRESSED_TEXTURES_REFERENCES.Num() - 1);
+        if (initiateArrowImages) {
+            UImage* arrowImage = InitArrowImage(arrowIndex);
+            AddArrowImageToBox(arrowImage);
+            arrowCommandImages.Add(arrowImage);
+            arrowCommands.Add(arrowIndex);
+        }
+        else {
+            UImage* arrowImage = arrowCommandImages[x];
+            UTexture2D* arrowTexture = arrowTextures[arrowIndex];
+            AdjustImageToTexture(arrowImage, arrowTexture);
+            arrowCommands[x] = arrowIndex;
+        }
     }
     currentArrowCommandIndex = 0;
 }
