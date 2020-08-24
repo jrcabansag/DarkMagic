@@ -23,15 +23,16 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 			TEXT("/Game/Images/UpArrow.UpArrow"), 
 			TEXT("/Game/Images/DownArrow.DownArrow"), 
 			TEXT("/Game/Images/LeftArrow.LeftArrow"), 
-			TEXT("/Game/Images/RightArrow.RightArrow")
+			TEXT("/Game/Images/RightArrow.RightArrow"),
+			TEXT("/Game/Images/Wildcard.Wildcard")
 		};
 		const TArray<const wchar_t*> ARROW_PRESSED_TEXTURES_REFERENCES = {
-			TEXT("/Game/Images/UpArrowWhite.UpArrowWhite"),
-			TEXT("/Game/Images/DownArrowWhite.DownArrowWhite"),
-			TEXT("/Game/Images/LeftArrowWhite.LeftArrowWhite"),
-			TEXT("/Game/Images/RightArrowWhite.RightArrowWhite")
+			TEXT("/Game/Images/UpArrowPressed.UpArrowPressed"),
+			TEXT("/Game/Images/DownArrowPressed.DownArrowPressed"),
+			TEXT("/Game/Images/LeftArrowPressed.LeftArrowPressed"),
+			TEXT("/Game/Images/RightArrowPressed.RightArrowPressed")
 		};
-		const int ARROW_COMMANDS_SIZE = 5;
+		const int ARROW_COMMANDS_SIZE = 7;
 		const float RESET_ARROW_TIMER_DURATION = 0.2f;
 
 		TArray<UTexture2D*> arrowTextures;
@@ -45,12 +46,12 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 
 		void InitArrowTextures();
 		void InitArrowBox();
-		void InitArrowCommands();
+		//void InitArrowCommands();
 		void AddArrowImageToBox(UImage* arrowImage);
 		void AdjustImageToTexture(UImage* arrowImage, UTexture2D* arrowTexture);
 		void IncorrectArrowPressed();
 		UFUNCTION()
-		void ResetArrowCommands();
+		void SetUpArrowCommands(bool initiateArrowImages);
 
 	public:
 		void PressedArrow(int arrowIndex);
