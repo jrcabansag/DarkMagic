@@ -32,7 +32,7 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 			TEXT("/Game/Images/LeftArrowPressed.LeftArrowPressed"),
 			TEXT("/Game/Images/RightArrowPressed.RightArrowPressed")
 		};
-		const int ARROW_COMMANDS_SIZE = 7;
+		const int ARROW_COMMANDS_SIZE = 5;
 		const float RESET_ARROW_TIMER_DURATION = 0.2f;
 
 		TArray<UTexture2D*> arrowTextures;

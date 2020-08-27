@@ -63,6 +63,10 @@ void ABattleGameMode::AddArrowImageToBox(UImage* arrowImage) {
 
 void ABattleGameMode::PressedArrow(int arrowIndex) {
     if (arrowBox != nullptr) {
+        if (arrowIndex < 0) {
+            IncorrectArrowPressed();
+            return;
+        }
         if (currentArrowCommandIndex < ARROW_COMMANDS_SIZE) {
             int correctArrowCommand = arrowCommands[currentArrowCommandIndex];
             bool isWildcard = correctArrowCommand == ARROW_TEXTURES_REFERENCES.Num()-1;
@@ -73,6 +77,7 @@ void ABattleGameMode::PressedArrow(int arrowIndex) {
                 currentArrowCommandIndex++;
             } else {
                 IncorrectArrowPressed();
+                return;
             }
         }
         if (currentArrowCommandIndex >= ARROW_COMMANDS_SIZE) {

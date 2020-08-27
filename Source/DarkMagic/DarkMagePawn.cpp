@@ -30,6 +30,7 @@ void ADarkMagePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Down", IE_Pressed, this, &ADarkMagePawn::Down);
 	PlayerInputComponent->BindAction("Left", IE_Pressed, this, &ADarkMagePawn::Left);
 	PlayerInputComponent->BindAction("Right", IE_Pressed, this, &ADarkMagePawn::Right);
+	PlayerInputComponent->BindAction("Reset", IE_Pressed, this, &ADarkMagePawn::Reset);
 }
 
 void ADarkMagePawn::Up() {
@@ -46,5 +47,9 @@ void ADarkMagePawn::Left() {
 
 void ADarkMagePawn::Right() {
 	battleGameMode->PressedArrow(3);
+}
+
+void ADarkMagePawn::Reset() {
+	battleGameMode->PressedArrow(-1);
 }
 

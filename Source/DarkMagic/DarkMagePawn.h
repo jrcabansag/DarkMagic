@@ -19,6 +19,7 @@ private:
 	void Down();
 	void Left();
 	void Right();
+	void Reset();
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaTime) override;
