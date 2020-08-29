@@ -7,6 +7,7 @@
 #include "Components/HorizontalBox.h"
 #include "Components/Image.h"
 #include "Containers/Array.h"
+#include "Blueprint/UserWidget.h"
 #include "BattleGameMode.generated.h"
 
 /**
@@ -18,25 +19,8 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 	GENERATED_BODY()
 	private:
 		virtual void StartPlay() override;
-
-		const TArray<const wchar_t*> ARROW_TEXTURES_REFERENCES = {
-			TEXT("/Game/Images/UpArrow.UpArrow"), 
-			TEXT("/Game/Images/DownArrow.DownArrow"), 
-			TEXT("/Game/Images/LeftArrow.LeftArrow"), 
-			TEXT("/Game/Images/RightArrow.RightArrow"),
-			TEXT("/Game/Images/Wildcard.Wildcard")
-		};
-		const TArray<const wchar_t*> ARROW_PRESSED_TEXTURES_REFERENCES = {
-			TEXT("/Game/Images/UpArrowPressed.UpArrowPressed"),
-			TEXT("/Game/Images/DownArrowPressed.DownArrowPressed"),
-			TEXT("/Game/Images/LeftArrowPressed.LeftArrowPressed"),
-			TEXT("/Game/Images/RightArrowPressed.RightArrowPressed")
-		};
-		const int ARROW_COMMANDS_SIZE = 5;
 		const float RESET_ARROW_TIMER_DURATION = 0.2f;
 
-		TArray<UTexture2D*> arrowTextures;
-		TArray<UTexture2D*> arrowPressedTextures;
 		UHorizontalBox* arrowBox;
 		TArray<int> arrowCommands;
 		TArray<UImage*> arrowCommandImages;
@@ -52,7 +36,19 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 		void IncorrectArrowPressed();
 		UFUNCTION()
 		void SetUpArrowCommands(bool initiateArrowImages);
-
 	public:
+		ABattleGameMode();
 		void PressedArrow(int arrowIndex);
+		UPROPERTY(EditAnywhere)
+		TArray<UTexture2D*> arrowTextures;
+		UPROPERTY(EditAnywhere)
+		TArray<UTexture2D*> arrowPressedTextures;
+		UPROPERTY(EditAnywhere)
+		int ARROW_COMMANDS_SIZE;
+		UPROPERTY(EditAnywhere)
+		UClass* battleWidgets;
+		UPROPERTY(EditAnywhere)
+		float ARROW_SCALE;
+		UPROPERTY(EditAnywhere)
+		float ARROW_PADDING;
 };
