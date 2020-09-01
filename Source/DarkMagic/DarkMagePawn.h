@@ -4,25 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
-#include "BattleGameMode.h"
+#include <functional>
 #include "DarkMagePawn.generated.h"
 
+DECLARE_DELEGATE_OneParam(ArrowCallbackDelegate, int);
+
+class ABattleGameMode;
 UCLASS()
 class DARKMAGIC_API ADarkMagePawn : public APawn
 {
 	GENERATED_BODY()
 private:
-	const int TOTAL_HEALTH = 500;
+	ADarkMagePawn();
+	int TOTAL_HEALTH = 500;
 	int currentHealth;
-	ABattleGameMode* battleGameMode;
-	void Up();
-	void Down();
-	void Left();
-	void Right();
-	void Reset();
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(float DeltaTime) override;
+	void ArrowCallbackFunction(int i);
 public:
-	ADarkMagePawn();
+	std::function<void(int)> arrowCallback;
 };

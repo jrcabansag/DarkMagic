@@ -9,13 +9,11 @@ ADarkMagePawn::ADarkMagePawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
-
 }
 
 void ADarkMagePawn::BeginPlay()
 {
 	Super::BeginPlay();
-	battleGameMode = (ABattleGameMode*)(GetWorld()->GetAuthGameMode());
 }
 
 void ADarkMagePawn::Tick(float DeltaTime)
@@ -25,31 +23,17 @@ void ADarkMagePawn::Tick(float DeltaTime)
 
 void ADarkMagePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	UE_LOG(LogTemp, Warning, TEXT("DARK MAGE PAWN SET UP PLAYER INPUT"));
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	PlayerInputComponent->BindAction("Up", IE_Pressed, this, &ADarkMagePawn::Up);
-	PlayerInputComponent->BindAction("Down", IE_Pressed, this, &ADarkMagePawn::Down);
-	PlayerInputComponent->BindAction("Left", IE_Pressed, this, &ADarkMagePawn::Left);
-	PlayerInputComponent->BindAction("Right", IE_Pressed, this, &ADarkMagePawn::Right);
-	PlayerInputComponent->BindAction("Reset", IE_Pressed, this, &ADarkMagePawn::Reset);
+	PlayerInputComponent->BindAction<ArrowCallbackDelegate>("Up", IE_Pressed, this, &ADarkMagePawn::ArrowCallbackFunction, 0);
+	PlayerInputComponent->BindAction<ArrowCallbackDelegate>("Down", IE_Pressed, this, &ADarkMagePawn::ArrowCallbackFunction, 1);
+	PlayerInputComponent->BindAction<ArrowCallbackDelegate>("Left", IE_Pressed, this, &ADarkMagePawn::ArrowCallbackFunction, 2);
+	PlayerInputComponent->BindAction<ArrowCallbackDelegate>("Right", IE_Pressed, this, &ADarkMagePawn::ArrowCallbackFunction, 3);
+	PlayerInputComponent->BindAction<ArrowCallbackDelegate>("Reset", IE_Pressed, this, &ADarkMagePawn::ArrowCallbackFunction, -1);
 }
 
-void ADarkMagePawn::Up() {
-	battleGameMode->PressedArrow(0);
+void ADarkMagePawn::ArrowCallbackFunction(int i) {
+	if (arrowCallback != nullptr) {
+		arrowCallback(i);
+	}
 }
-
-void ADarkMagePawn::Down() {
-	battleGameMode->PressedArrow(1);
-}
-
-void ADarkMagePawn::Left() {
-	battleGameMode->PressedArrow(2);
-}
-
-void ADarkMagePawn::Right() {
-	battleGameMode->PressedArrow(3);
-}
-
-void ADarkMagePawn::Reset() {
-	battleGameMode->PressedArrow(-1);
-}
-

@@ -8,8 +8,10 @@
 #include "Components/Image.h"
 #include "Containers/Array.h"
 #include "Blueprint/UserWidget.h"
+#include <functional>
 #include "BattleGameMode.generated.h"
 
+class ADarkMagePawn;
 /**
  * 
  */
@@ -19,30 +21,29 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 	GENERATED_BODY()
 	private:
 		virtual void StartPlay() override;
-		const float RESET_ARROW_TIMER_DURATION = 0.2f;
 
+		//UI
 		UHorizontalBox* arrowBox;
 		TArray<int> arrowCommands;
 		TArray<UImage*> arrowCommandImages;
 		int currentArrowCommandIndex;
 		UImage* InitArrowImage(int arrowIndex);
 		FTimerHandle resetArrowTimerHandle;
-
-		void InitArrowTextures();
 		void InitArrowBox();
-		//void InitArrowCommands();
+		void SetUpArrowCommands(bool initiateArrowImages);
 		void AddArrowImageToBox(UImage* arrowImage);
 		void AdjustImageToTexture(UImage* arrowImage, UTexture2D* arrowTexture);
 		void IncorrectArrowPressed();
-		UFUNCTION()
-		void SetUpArrowCommands(bool initiateArrowImages);
+
+		//Battle Logic
+		ADarkMagePawn* player;
+		void InitPlayer();
 	public:
-		ABattleGameMode();
 		void PressedArrow(int arrowIndex);
 		UPROPERTY(EditAnywhere)
-		TArray<UTexture2D*> arrowTextures;
+		TArray<UTexture2D*> ARROW_TEXTURES;
 		UPROPERTY(EditAnywhere)
-		TArray<UTexture2D*> arrowPressedTextures;
+		TArray<UTexture2D*> ARROW_PRESSED_TEXTURES;
 		UPROPERTY(EditAnywhere)
 		int ARROW_COMMANDS_SIZE;
 		UPROPERTY(EditAnywhere)
@@ -51,4 +52,6 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 		float ARROW_SCALE;
 		UPROPERTY(EditAnywhere)
 		float ARROW_PADDING;
+		UPROPERTY(EditAnywhere)
+		float RESET_ARROW_TIMER_DURATION;
 };

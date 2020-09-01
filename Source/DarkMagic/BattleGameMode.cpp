@@ -6,41 +6,19 @@
 #include "Components/TextBlock.h"
 #include "Components/HorizontalBoxSlot.h"
 #include "Blueprint/WidgetTree.h"
+#include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
-
-ABattleGameMode::ABattleGameMode() {
-    //InitArrowTextures();
-    //InitArrowBox();
-}
+#include "DarkMagePawn.h"
 
 void ABattleGameMode::StartPlay()
 {
     Super::StartPlay();
-    //arrowTextures.Add(upArrowTexture);
-    //arrowTextures.Add(downArrowTexture);
-    //arrowTextures.Add(leftArrowTexture);
-    //arrowTextures.Add(rightArrowTexture);
-    //arrowTextures.Add(wildcardArrowTexture);
-    //arrowPressedTextures.Add(upArrowPressedTexture);
-    //arrowPressedTextures.Add(downArrowPressedTexture);
-    //arrowPressedTextures.Add(leftArrowPressedTexture);
-    //arrowPressedTextures.Add(rightArrowPressedTexture);
-    //InitArrowTextures();
+    InitPlayer();
     InitArrowBox();
     SetUpArrowCommands(true);
 }
 
 void ABattleGameMode::InitArrowBox() {
-    //static ConstructorHelpers::FClassFinder<UClass> battleWidgetClass(TEXT("/Game/BattleHUD.BattleHUD_C"));
-    //if (battleWidgetClass.Succeeded())
-    //{
-    //    UUserWidget* battleWidget = CreateWidget<UUserWidget>(this->GetGameInstance(), Cast<UClass>(battleWidgetClass.Class));
-    //    if (battleWidget) {
-    //        battleWidget->AddToViewport();
-    //        FName arrowBoxName = FName(TEXT("ArrowBox"));
-    //        arrowBox = (UHorizontalBox*)(battleWidget->WidgetTree->FindWidget(arrowBoxName));
-    //    }
-    //}
        UUserWidget* battleWidget = CreateWidget<UUserWidget>(this->GetGameInstance(), battleWidgets);
         if (battleWidget) {
             battleWidget->AddToViewport();
@@ -49,26 +27,9 @@ void ABattleGameMode::InitArrowBox() {
         }
 }
 
-void ABattleGameMode::InitArrowTextures() {
-    //for (int x = 0; x < ARROW_TEXTURES_REFERENCES.Num(); x++) {
-    //    ConstructorHelpers::FObjectFinder<UTexture2D> arrowTexture(ARROW_TEXTURES_REFERENCES[x]);
-    //    if (arrowTexture.Succeeded()) {
-    //        arrowTextures.Add((UTexture2D*)arrowTexture.Object);
-    //    }
-    //    //arrowTextures.Add(LoadObject<UTexture2D>(NULL, ARROW_TEXTURES_REFERENCES[x], NULL, LOAD_None, NULL));
-    //}
-    //for (int x = 0; x < ARROW_PRESSED_TEXTURES_REFERENCES.Num(); x++) {
-    //    ConstructorHelpers::FObjectFinder<UTexture2D> arrowTexture(ARROW_PRESSED_TEXTURES_REFERENCES[x]);
-    //    if (arrowTexture.Succeeded()) {
-    //        arrowPressedTextures.Add((UTexture2D*)arrowTexture.Object);
-    //    }
-    //    //arrowPressedTextures.Add(LoadObject<UTexture2D>(NULL, ARROW_PRESSED_TEXTURES_REFERENCES[x], NULL, LOAD_None, NULL));
-    //}
-}
-
 UImage* ABattleGameMode::InitArrowImage(int arrowIndex) {
-    UE_LOG(LogTemp, Warning, TEXT("ARROW TEXTURES SIZE IS %d"), arrowTextures.Num());
-    UTexture2D* arrowTexture = arrowTextures[arrowIndex];
+    UE_LOG(LogTemp, Warning, TEXT("ARROW TEXTURES SIZE IS %d"), ARROW_TEXTURES.Num());
+    UTexture2D* arrowTexture = ARROW_TEXTURES[arrowIndex];
     UImage* arrowImage = NewObject<UImage>(UImage::StaticClass());
     FVector2D arrowDimensions = FVector2D(arrowTexture->GetSizeX()*ARROW_SCALE, arrowTexture->GetSizeY()*ARROW_SCALE);
     arrowImage->SetVisibility(ESlateVisibility::Visible);
@@ -100,11 +61,11 @@ void ABattleGameMode::PressedArrow(int arrowIndex) {
         }
         if (currentArrowCommandIndex < ARROW_COMMANDS_SIZE) {
             int correctArrowCommand = arrowCommands[currentArrowCommandIndex];
-            bool isWildcard = correctArrowCommand == arrowTextures.Num()-1;
+            bool isWildcard = correctArrowCommand == ARROW_TEXTURES.Num()-1;
             if (isWildcard || correctArrowCommand == arrowIndex) {
                 UImage* arrowImage = arrowCommandImages[currentArrowCommandIndex];
                 UE_LOG(LogTemp, Warning, TEXT("GOT ARROW IMAGE"));
-                UTexture2D* arrowTexture = arrowPressedTextures[arrowIndex];
+                UTexture2D* arrowTexture = ARROW_PRESSED_TEXTURES[arrowIndex];
                 UE_LOG(LogTemp, Warning, TEXT("GOT ARROW TEXTURE"), arrowIndex);
                 AdjustImageToTexture(arrowImage, arrowTexture);
                 currentArrowCommandIndex++;
@@ -124,7 +85,7 @@ void ABattleGameMode::SetUpArrowCommands(bool initiateArrowImages) {
     UE_LOG(LogTemp, Warning, TEXT("SETTING ARROW COMMANDS"));
     for (int x = 0; x < ARROW_COMMANDS_SIZE; x++) {
         int arrowIndex = x == 0 ?
-            arrowTextures.Num()-1 : FMath::RandRange(0, arrowPressedTextures.Num() - 1);
+            ARROW_TEXTURES.Num()-1 : FMath::RandRange(0, ARROW_PRESSED_TEXTURES.Num() - 1);
         if (initiateArrowImages) {
             UImage* arrowImage = InitArrowImage(arrowIndex);
             AddArrowImageToBox(arrowImage);
@@ -132,7 +93,7 @@ void ABattleGameMode::SetUpArrowCommands(bool initiateArrowImages) {
             arrowCommands.Add(arrowIndex);
         } else {
             UImage* arrowImage = arrowCommandImages[x];
-            UTexture2D* arrowTexture = arrowTextures[arrowIndex];
+            UTexture2D* arrowTexture = ARROW_TEXTURES[arrowIndex];
             AdjustImageToTexture(arrowImage, arrowTexture);
             arrowCommands[x] = arrowIndex;
         }
@@ -143,9 +104,17 @@ void ABattleGameMode::SetUpArrowCommands(bool initiateArrowImages) {
 void ABattleGameMode::IncorrectArrowPressed() {
     for (int x = currentArrowCommandIndex-1; x >= 0; x--) {
         UImage* arrowImage = arrowCommandImages[x];
-        UTexture2D* arrowTexture = arrowTextures[arrowCommands[x]];
+        UTexture2D* arrowTexture = ARROW_TEXTURES[arrowCommands[x]];
         AdjustImageToTexture(arrowImage, arrowTexture);
     }
     currentArrowCommandIndex = 0;
+}
+
+void ABattleGameMode::InitPlayer() {
+    UE_LOG(LogTemp, Warning, TEXT("BATTLE GAME MODE INITED PLAYER"));
+    player = (ADarkMagePawn*)UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    player->arrowCallback = [this](int i) {
+        PressedArrow(i);
+    };
 }
 
