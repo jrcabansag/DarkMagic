@@ -3,24 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Pawn.h"
 #include <functional>
-#include "DarkMagePawn.generated.h"
+#include "BattleCharacter.h"
+#include "DarkMageBattleCharacter.generated.h"
 
 DECLARE_DELEGATE_OneParam(ArrowCallbackDelegate, int);
 
 class ABattleGameMode;
 UCLASS()
-class DARKMAGIC_API ADarkMagePawn : public APawn
+class DARKMAGIC_API ADarkMageBattleCharacter : public ABattleCharacter
 {
 	GENERATED_BODY()
 private:
-	ADarkMagePawn();
-	int TOTAL_HEALTH = 500;
-	int currentHealth;
-	virtual void BeginPlay() override;
+	ADarkMageBattleCharacter();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void Tick(float DeltaTime) override;
 	void ArrowCallbackFunction(int i);
 public:
 	std::function<void(int)> arrowCallback;

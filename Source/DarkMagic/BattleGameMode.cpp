@@ -8,7 +8,6 @@
 #include "Blueprint/WidgetTree.h"
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
-#include "DarkMagePawn.h"
 
 void ABattleGameMode::StartPlay()
 {
@@ -19,11 +18,11 @@ void ABattleGameMode::StartPlay()
 }
 
 void ABattleGameMode::InitArrowBox() {
-       UUserWidget* battleWidget = CreateWidget<UUserWidget>(this->GetGameInstance(), battleWidgets);
-        if (battleWidget) {
-            battleWidget->AddToViewport();
+       UUserWidget* battleHUD = CreateWidget<UUserWidget>(this->GetGameInstance(), BATTLE_HUD);
+        if (battleHUD) {
+            battleHUD->AddToViewport();
             FName arrowBoxName = FName(TEXT("ArrowBox"));
-            arrowBox = (UHorizontalBox*)(battleWidget->WidgetTree->FindWidget(arrowBoxName));
+            arrowBox = (UHorizontalBox*)(battleHUD->WidgetTree->FindWidget(arrowBoxName));
         }
 }
 
@@ -112,7 +111,7 @@ void ABattleGameMode::IncorrectArrowPressed() {
 
 void ABattleGameMode::InitPlayer() {
     UE_LOG(LogTemp, Warning, TEXT("BATTLE GAME MODE INITED PLAYER"));
-    player = (ADarkMagePawn*)UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
+    player = (ADarkMageBattleCharacter*)UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
     player->arrowCallback = [this](int i) {
         PressedArrow(i);
     };

@@ -9,9 +9,9 @@
 #include "Containers/Array.h"
 #include "Blueprint/UserWidget.h"
 #include <functional>
+#include "DarkMageBattleCharacter.h"
 #include "BattleGameMode.generated.h"
 
-class ADarkMagePawn;
 /**
  * 
  */
@@ -36,18 +36,18 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 		void IncorrectArrowPressed();
 
 		//Battle Logic
-		ADarkMagePawn* player;
+		ADarkMageBattleCharacter* player;
 		void InitPlayer();
 	public:
 		void PressedArrow(int arrowIndex);
+		UPROPERTY(EditAnywhere)
+		UClass* BATTLE_HUD;
 		UPROPERTY(EditAnywhere)
 		TArray<UTexture2D*> ARROW_TEXTURES;
 		UPROPERTY(EditAnywhere)
 		TArray<UTexture2D*> ARROW_PRESSED_TEXTURES;
 		UPROPERTY(EditAnywhere)
 		int ARROW_COMMANDS_SIZE;
-		UPROPERTY(EditAnywhere)
-		UClass* battleWidgets;
 		UPROPERTY(EditAnywhere)
 		float ARROW_SCALE;
 		UPROPERTY(EditAnywhere)
