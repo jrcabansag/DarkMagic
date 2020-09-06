@@ -2,9 +2,7 @@
 
 
 #include "BattleCharacter.h"
-#include "Engine/SkeletalMesh.h"
 #include "Components/CapsuleComponent.h"
-#include "Particles/ParticleSystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "UObject/Object.h"
 #include "Components/SceneComponent.h"
@@ -14,18 +12,13 @@
 ABattleCharacter::ABattleCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	//PrimaryActorTick.bCanEverTick = true;
 	currentHealth = TOTAL_HEALTH;
-	if (this) {
-		UCharacterMovementComponent* characterMovementComponent = GetCharacterMovement();
-		if (characterMovementComponent) {
-			characterMovementComponent->DefaultLandMovementMode = MOVE_Flying;
-		}
-		USkeletalMeshComponent* meshComponent = GetMesh();
-		leftHandParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(FName("LeftHandParticles"));
-		leftHandParticleSystem->AttachToComponent(meshComponent, FAttachmentTransformRules::KeepRelativeTransform, FName("LowerHand_L"));
-		rightHandParticleSystem = CreateDefaultSubobject<UParticleSystemComponent>(FName("RightHandParticles"));
-		rightHandParticleSystem->AttachToComponent(meshComponent, FAttachmentTransformRules::KeepRelativeTransform, FName("LowerHand_R"));
+	meshComponent = GetMesh();
+	if (meshComponent) {
+		InitHandParticleSystemComponent(leftHandParticleSystemComponent, FName("LeftHandParticles"), FName("LowerHand_L"));
+		InitHandParticleSystemComponent(rightHandParticleSystemComponent, FName("RightHandParticles"), FName("LowerHand_R"));
+		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
 	}
 }
 
@@ -33,59 +26,47 @@ ABattleCharacter::ABattleCharacter()
 void ABattleCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	if (HAND_PARTICLES && !handParticlesSpawned) {
-		leftHandParticleSystem->SetTemplate(HAND_PARTICLES);
-		rightHandParticleSystem->SetTemplate(HAND_PARTICLES);
-		leftHandParticleSystem->SetRelativeLocation(HAND_PARTICLE_LOCATION);
-		leftHandParticleSystem->SetRelativeScale3D(FVector(0.01 * HAND_PARTICLE_SCALE, 0.01 * HAND_PARTICLE_SCALE, 0.01 * HAND_PARTICLE_SCALE));
-		rightHandParticleSystem->SetRelativeLocation(HAND_PARTICLE_LOCATION);
-		rightHandParticleSystem->SetRelativeScale3D(FVector(0.01 * HAND_PARTICLE_SCALE, 0.01 * HAND_PARTICLE_SCALE, 0.01 * HAND_PARTICLE_SCALE));
-		handParticlesSpawned = true;
-		UE_LOG(LogTemp, Warning, TEXT("HAND PARTICLES SPAWNED IN CONSTRUCTOR"));
+	if (HAND_PARTICLES) {
+		SetUpHandParticleSystemComponent(leftHandParticleSystemComponent);
+		SetUpHandParticleSystemComponent(rightHandParticleSystemComponent);
 	}
-	else {
-		UE_LOG(LogTemp, Warning, TEXT("HAND PARTICLES ALREADY SPAWNED WHEN INIT CONSTRUCTOR"));
-	}
+	leftHandParticleSystemComponent->RegisterComponent();
+	rightHandParticleSystemComponent->RegisterComponent();
 }
 
 void ABattleCharacter::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	if (this) {
-		FVector currentLocation = GetActorLocation();
-		SetActorLocation(FVector(currentLocation.X, currentLocation.Y, MESH_HEIGHT / 2));
-		USkeletalMeshComponent* meshComponent = GetMesh();
-		if (meshComponent) {
-			FVector meshLocation = FVector(0.0f, 0.0f, -MESH_HEIGHT / 2);
-			meshComponent->SetRelativeLocation(meshLocation);
-			UCapsuleComponent* capsuleComponent = GetCapsuleComponent();
-			if (capsuleComponent) {
-				capsuleComponent->SetCapsuleHalfHeight(MESH_HEIGHT / 2);
-				capsuleComponent->SetCapsuleRadius(MESH_RADIUS);
-			}
-			if (HAND_PARTICLES) {
-				leftHandParticleSystem->SetTemplate(HAND_PARTICLES);
-				rightHandParticleSystem->SetTemplate(HAND_PARTICLES);
-				leftHandParticleSystem->SetRelativeLocation(HAND_PARTICLE_LOCATION);
-				leftHandParticleSystem->SetRelativeScale3D(FVector(0.01*HAND_PARTICLE_SCALE, 0.01*HAND_PARTICLE_SCALE, 0.01*HAND_PARTICLE_SCALE));
-				rightHandParticleSystem->SetRelativeLocation(HAND_PARTICLE_LOCATION);
-				rightHandParticleSystem->SetRelativeScale3D(FVector(0.01 *HAND_PARTICLE_SCALE, 0.01 *HAND_PARTICLE_SCALE, 0.01 *HAND_PARTICLE_SCALE));
-				handParticlesSpawned = true;
-				UE_LOG(LogTemp, Warning, TEXT("HAND PARTICLES SPAWNED"));
-			}
-		}
+	AdjustMeshToSize();
+	if (HAND_PARTICLES) {
+		SetUpHandParticleSystemComponent(leftHandParticleSystemComponent);
+		SetUpHandParticleSystemComponent(rightHandParticleSystemComponent);
 	}
 }
-// Called every frame
-void ABattleCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 
+void ABattleCharacter::InitHandParticleSystemComponent(UParticleSystemComponent*& handParticleSystemComponent, FName componentName, FName componentToAttachToName) {
+	handParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(componentName);
+	handParticleSystemComponent->AttachToComponent(meshComponent, FAttachmentTransformRules::KeepRelativeTransform, componentToAttachToName);
 }
 
-// Called to bind functionality to input
-void ABattleCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ABattleCharacter::SetUpHandParticleSystemComponent(UParticleSystemComponent* handParticleSystemComponent)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	handParticleSystemComponent->SetTemplate(HAND_PARTICLES);
+	handParticleSystemComponent->SetRelativeLocation(HAND_PARTICLE_LOCATION);
+	float handParticleScale = 0.01f * HAND_PARTICLE_SCALE;
+	handParticleSystemComponent->SetRelativeScale3D(FVector(handParticleScale, handParticleScale, handParticleScale));
+}
 
+void ABattleCharacter::AdjustMeshToSize() {
+	if (meshComponent) {
+		FVector currentLocation = GetActorLocation();
+		SetActorLocation(FVector(currentLocation.X, currentLocation.Y, MESH_HEIGHT / 2));
+		FVector meshLocation = FVector(0.0f, 0.0f, -MESH_HEIGHT / 2);
+		meshComponent->SetRelativeLocation(meshLocation);
+		UCapsuleComponent* capsuleComponent = GetCapsuleComponent();
+		if (capsuleComponent) {
+			capsuleComponent->SetCapsuleHalfHeight(MESH_HEIGHT / 2);
+			capsuleComponent->SetCapsuleRadius(MESH_RADIUS);
+		}
+	}
 }

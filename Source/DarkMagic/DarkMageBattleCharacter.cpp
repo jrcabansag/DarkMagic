@@ -10,7 +10,7 @@ ADarkMageBattleCharacter::ADarkMageBattleCharacter()
 
 void ADarkMageBattleCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	UE_LOG(LogTemp, Warning, TEXT("DARK MAGE PAWN SET UP PLAYER INPUT"));
+	UE_LOG(LogTemp, Warning, TEXT("DARK MAGE BATTLE CHARACTER SET UP PLAYER INPUT"));
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction<ArrowCallbackDelegate>("Up", IE_Pressed, this, &ADarkMageBattleCharacter::ArrowCallbackFunction, 0);
 	PlayerInputComponent->BindAction<ArrowCallbackDelegate>("Down", IE_Pressed, this, &ADarkMageBattleCharacter::ArrowCallbackFunction, 1);
