@@ -111,9 +111,11 @@ void ABattleGameMode::IncorrectArrowPressed() {
 
 void ABattleGameMode::InitPlayer() {
     UE_LOG(LogTemp, Warning, TEXT("BATTLE GAME MODE INITED PLAYER"));
-    player = (ADarkMageBattleCharacter*)UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
-    player->arrowCallback = [this](int i) {
-        PressedArrow(i);
-    };
+    player = (ADarkMageBattleCharacter*)UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+    if (player) {
+        player->arrowCallback = [this](int i) {
+            PressedArrow(i);
+        };
+    }
 }
 
