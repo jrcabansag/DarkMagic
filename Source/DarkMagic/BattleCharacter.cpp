@@ -33,7 +33,19 @@ ABattleCharacter::ABattleCharacter()
 void ABattleCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	USkeletalMeshComponent* meshComponent = GetMesh();
+	if (HAND_PARTICLES && !handParticlesSpawned) {
+		leftHandParticleSystem->SetTemplate(HAND_PARTICLES);
+		rightHandParticleSystem->SetTemplate(HAND_PARTICLES);
+		leftHandParticleSystem->SetRelativeLocation(HAND_PARTICLE_LOCATION);
+		leftHandParticleSystem->SetRelativeScale3D(FVector(0.01 * HAND_PARTICLE_SCALE, 0.01 * HAND_PARTICLE_SCALE, 0.01 * HAND_PARTICLE_SCALE));
+		rightHandParticleSystem->SetRelativeLocation(HAND_PARTICLE_LOCATION);
+		rightHandParticleSystem->SetRelativeScale3D(FVector(0.01 * HAND_PARTICLE_SCALE, 0.01 * HAND_PARTICLE_SCALE, 0.01 * HAND_PARTICLE_SCALE));
+		handParticlesSpawned = true;
+		UE_LOG(LogTemp, Warning, TEXT("HAND PARTICLES SPAWNED IN CONSTRUCTOR"));
+	}
+	else {
+		UE_LOG(LogTemp, Warning, TEXT("HAND PARTICLES ALREADY SPAWNED WHEN INIT CONSTRUCTOR"));
+	}
 }
 
 void ABattleCharacter::OnConstruction(const FTransform& Transform)
@@ -58,6 +70,8 @@ void ABattleCharacter::OnConstruction(const FTransform& Transform)
 				leftHandParticleSystem->SetRelativeScale3D(FVector(0.01*HAND_PARTICLE_SCALE, 0.01*HAND_PARTICLE_SCALE, 0.01*HAND_PARTICLE_SCALE));
 				rightHandParticleSystem->SetRelativeLocation(HAND_PARTICLE_LOCATION);
 				rightHandParticleSystem->SetRelativeScale3D(FVector(0.01 *HAND_PARTICLE_SCALE, 0.01 *HAND_PARTICLE_SCALE, 0.01 *HAND_PARTICLE_SCALE));
+				handParticlesSpawned = true;
+				UE_LOG(LogTemp, Warning, TEXT("HAND PARTICLES SPAWNED"));
 			}
 		}
 	}

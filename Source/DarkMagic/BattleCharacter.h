@@ -30,6 +30,7 @@ private:
 	UParticleSystem* HAND_PARTICLES;
 	UParticleSystemComponent* leftHandParticleSystem;
 	UParticleSystemComponent* rightHandParticleSystem;
+	bool handParticlesSpawned = false;
 	UPROPERTY(EditAnywhere)
 	float HAND_PARTICLE_SCALE = 1.0f;
 	UPROPERTY(EditAnywhere)
