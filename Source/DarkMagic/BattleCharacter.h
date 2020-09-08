@@ -18,10 +18,10 @@ protected:
 	ABattleCharacter();
 	virtual void BeginPlay() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
-
-private:
+public:
 	UPROPERTY(EditAnywhere)
 	int TOTAL_HEALTH = 1000;
+private:
 	UPROPERTY(EditAnywhere)
 	int MESH_HEIGHT = 250;
 	UPROPERTY(EditAnywhere)
@@ -36,7 +36,6 @@ private:
 	FVector HAND_PARTICLE_LOCATION;
 	void InitHandParticleSystemComponent(UParticleSystemComponent*& handParticleSystemComponent, FName componentName, FName componentToAttachToName);
 	void SetUpHandParticleSystemComponent(UParticleSystemComponent* handParticleSystemComponent);
-	int currentHealth;
 	USkeletalMeshComponent* meshComponent;
 	void AdjustMeshToSize();
 };
