@@ -8,6 +8,12 @@ ADarkMageBattleCharacter::ADarkMageBattleCharacter()
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
+void ADarkMageBattleCharacter::Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback, std::function<void(int)> initArrowCallback)
+{
+	Super::Init(initOpponent, initUpdateHealthCallback);
+	arrowCallback = initArrowCallback;
+}
+
 void ADarkMageBattleCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	UE_LOG(LogTemp, Warning, TEXT("DARK MAGE BATTLE CHARACTER SET UP PLAYER INPUT"));
@@ -19,8 +25,14 @@ void ADarkMageBattleCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	PlayerInputComponent->BindAction<ArrowCallbackDelegate>("Reset", IE_Pressed, this, &ADarkMageBattleCharacter::ArrowCallbackFunction, -1);
 }
 
-void ADarkMageBattleCharacter::ArrowCallbackFunction(int i) {
-	if (arrowCallback != nullptr) {
+void ADarkMageBattleCharacter::ArrowCallbackFunction(int i)
+{
+	if (arrowCallback) {
 		arrowCallback(i);
 	}
+}
+
+void ADarkMageBattleCharacter::Attack()
+{
+	Super::Attack();
 }

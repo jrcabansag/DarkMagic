@@ -13,31 +13,22 @@
 void ABattleGameMode::StartPlay()
 {
     Super::StartPlay();
-    InitWorld();
+    FindWorld();
+    FindHUD();
+    FindPlayer();
+    FindEnemy();
     InitPlayer();
     InitEnemy();
-    InitHUD();
-    UpdateHealthUI();
     SetUpArrowCommands(true);
 }
 
-void ABattleGameMode::InitWorld() {
+void ABattleGameMode::FindWorld()
+{
     world = GetWorld();
 }
 
-void ABattleGameMode::InitEnemy() {
-    TArray<AActor*> enemyArray;
-    UGameplayStatics::GetAllActorsOfClass(world, AEnemyBattleCharacter::StaticClass(), enemyArray);
-    if (enemyArray.Num() > 0) {
-        enemy = (AEnemyBattleCharacter*)enemyArray[0];
-    }
-    ENEMY_TOTAL_HEALTH = enemy->TOTAL_HEALTH;
-    enemyHealth = ENEMY_TOTAL_HEALTH;
-    FTimerDelegate enemyAttackTimerDelegate = FTimerDelegate::CreateUObject(this, &ABattleGameMode::EnemyAttack);
-    world->GetTimerManager().SetTimer(enemyAttackTimerHandle, enemyAttackTimerDelegate, ENEMY_ATTACK_TIMER_DURATION, true);
-}
-
-void ABattleGameMode::InitHUD() {
+void ABattleGameMode::FindHUD()
+{
     UUserWidget* battleHUD = CreateWidget<UUserWidget>(this->GetGameInstance(), BATTLE_HUD);
     if (battleHUD) {
         battleHUD->AddToViewport();
@@ -49,15 +40,58 @@ void ABattleGameMode::InitHUD() {
     }
 }
 
-void ABattleGameMode::UpdateHealthUI() {
-    int clampedPlayerHealth = FMath::Clamp(playerHealth, 0, PLAYER_TOTAL_HEALTH);
-    int clampedEnemyHealth = FMath::Clamp(enemyHealth, 0, ENEMY_TOTAL_HEALTH);
-    FString playerHealthString = FString::Printf(TEXT("%d/%d"), clampedPlayerHealth, PLAYER_TOTAL_HEALTH);
-    FString enemyHealthString = FString::Printf(TEXT("%d/%d"), clampedEnemyHealth, ENEMY_TOTAL_HEALTH);
-    playerHealthText->SetText(FText::FromString(playerHealthString));
-    enemyHealthText->SetText(FText::FromString(enemyHealthString));
-    playerHealthBar->SetPercent(float(clampedPlayerHealth) / float(PLAYER_TOTAL_HEALTH));
-    enemyHealthBar->SetPercent(float(clampedEnemyHealth) / float(ENEMY_TOTAL_HEALTH));
+void ABattleGameMode::FindPlayer()
+{
+    player = (ADarkMageBattleCharacter*)UGameplayStatics::GetPlayerCharacter(world, 0);
+}
+
+void ABattleGameMode::FindEnemy()
+{
+    TArray<AActor*> enemyArray;
+    UGameplayStatics::GetAllActorsOfClass(world, AEnemyBattleCharacter::StaticClass(), enemyArray);
+    if (enemyArray.Num() > 0) {
+        enemy = (AEnemyBattleCharacter*)enemyArray[0];
+    }
+}
+
+void ABattleGameMode::InitPlayer()
+{
+    UE_LOG(LogTemp, Warning, TEXT("BATTLE GAME MODE INITED PLAYER"));
+    if (player) {
+        std::function<void(int, int)> playerUpdateHealthUI = [this](int playerCurrentHealth, int playerTotalHealth) {
+            UpdateHealthUI((ABattleCharacter*)player, playerCurrentHealth, playerTotalHealth);
+        };
+        std::function<void(int)> playerArrowCallback = [this](int i) {
+            PressedArrow(i);
+        };
+        player->Init((ABattleCharacter*)enemy, playerUpdateHealthUI, playerArrowCallback);
+    }
+}
+
+void ABattleGameMode::InitEnemy() {
+    UE_LOG(LogTemp, Warning, TEXT("BATTLE GAME MODE INITED ENEMY"));
+    if (enemy) {
+        std::function<void(int, int)> enemyUpdateHealthUI = [this](int enemyCurrentHealth, int enemyTotalHealth) {
+            UpdateHealthUI((ABattleCharacter*)enemy, enemyCurrentHealth, enemyTotalHealth);
+        };
+        enemy->Init((ABattleCharacter*)player, enemyUpdateHealthUI);
+    }
+}
+
+void ABattleGameMode::UpdateHealthUI(ABattleCharacter* battleCharacter, int currentHealth, int totalHealth)
+{
+    bool isBattleCharacterPlayer = battleCharacter == (ABattleCharacter*)player;
+    FString healthString = FString::Printf(TEXT("%d/%d"), currentHealth, totalHealth);
+    UTextBlock* healthText = isBattleCharacterPlayer ? playerHealthText : enemyHealthText;
+    UProgressBar* healthBar = isBattleCharacterPlayer ? playerHealthBar : enemyHealthBar;
+    healthText->SetText(FText::FromString(healthString));
+    healthBar->SetPercent(float(currentHealth) / float(totalHealth));
+}
+
+void ABattleGameMode::PlayerAttack() {
+    UE_LOG(LogTemp, Warning, TEXT("PLAYER ATTACKING!!!!!!!!!!!!!!!!!!!"));
+    currentArrowCommandIndex = RESETTING_ARROW_INDEX;
+    player->Attack();
 }
 
 UImage* ABattleGameMode::InitArrowImage(int arrowIndex) {
@@ -115,39 +149,6 @@ void ABattleGameMode::PressedArrow(int arrowIndex) {
     }
 }
 
-void ABattleGameMode::PlayerAttack() {
-    UE_LOG(LogTemp, Warning, TEXT("PLAYER ATTACKING!!!!!!!!!!!!!!!!!!!"));
-    currentArrowCommandIndex = RESETTING_ARROW_INDEX;
-    if (PLAYER_PROJECTILE) {
-        AProjectile* projectile = world->SpawnActor<AProjectile>(PLAYER_PROJECTILE);
-        projectile->Init(player, enemy, [this] (int damage) {
-            DamageEnemy(damage);
-        });
-    }
-}
-
-void ABattleGameMode::EnemyAttack() {
-    UE_LOG(LogTemp, Warning, TEXT("ENEMY ATTACKING!!!!!!!!!!!!!!!!!!!"));
-    if (ENEMY_PROJECTILE) {
-        AProjectile* projectile = world->SpawnActor<AProjectile>(ENEMY_PROJECTILE);
-        projectile->Init(enemy, player, [this](int damage) {
-            DamagePlayer(damage);
-        });
-    }
-}
-
-void ABattleGameMode::DamagePlayer(int damage) {
-    UE_LOG(LogTemp, Warning, TEXT("DAMAGED PLAYER FOR %d"), damage);
-    playerHealth -= damage;
-    UpdateHealthUI();
-}
-
-void ABattleGameMode::DamageEnemy(int damage) {
-    UE_LOG(LogTemp, Warning, TEXT("DAMAGED ENEMY FOR %d"), damage);
-    enemyHealth -= damage;
-    UpdateHealthUI();
-}
-
 void ABattleGameMode::SetUpArrowCommands(bool initiateArrowImages) {
     UE_LOG(LogTemp, Warning, TEXT("SETTING ARROW COMMANDS"));
     for (int x = 0; x < ARROW_COMMANDS_SIZE; x++) {
@@ -175,17 +176,5 @@ void ABattleGameMode::IncorrectArrowPressed() {
         AdjustImageToTexture(arrowImage, arrowTexture);
     }
     currentArrowCommandIndex = 0;
-}
-
-void ABattleGameMode::InitPlayer() {
-    UE_LOG(LogTemp, Warning, TEXT("BATTLE GAME MODE INITED PLAYER"));
-    player = (ADarkMageBattleCharacter*)UGameplayStatics::GetPlayerCharacter(world, 0);
-    if (player) {
-        player->arrowCallback = [this](int i) {
-            PressedArrow(i);
-        };
-    }
-    PLAYER_TOTAL_HEALTH = player->TOTAL_HEALTH;
-    playerHealth = PLAYER_TOTAL_HEALTH;
 }
 

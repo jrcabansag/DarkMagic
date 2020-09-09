@@ -13,11 +13,24 @@ ABattleCharacter::ABattleCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
-	meshComponent = GetMesh();
-	if (meshComponent) {
-		InitHandParticleSystemComponent(leftHandParticleSystemComponent, FName("LeftHandParticles"), FName("LowerHand_L"));
-		InitHandParticleSystemComponent(rightHandParticleSystemComponent, FName("RightHandParticles"), FName("LowerHand_R"));
+	MeshComponent = GetMesh();
+	if (MeshComponent) {
+		MeshComponent->SetCollisionProfileName(TEXT("OverlapAll"));
+		MeshComponent->SetGenerateOverlapEvents(true);
+		MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ABattleCharacter::OnMeshBeginOverlap);
+		InitHandParticleSystemComponent(LeftHandParticleSystemComponent, FName("LeftHandParticles"), FName("LowerHand_L"));
+		InitHandParticleSystemComponent(RightHandParticleSystemComponent, FName("RightHandParticles"), FName("LowerHand_R"));
 		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
+	}
+	currentHealth = TOTAL_HEALTH;
+}
+
+void ABattleCharacter::Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback)
+{
+	opponent = initOpponent;
+	updateHealthCallback = initUpdateHealthCallback;
+	if (updateHealthCallback) {
+		updateHealthCallback(currentHealth, TOTAL_HEALTH);
 	}
 }
 
@@ -26,11 +39,12 @@ void ABattleCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	if (HAND_PARTICLES) {
-		SetUpHandParticleSystemComponent(leftHandParticleSystemComponent);
-		SetUpHandParticleSystemComponent(rightHandParticleSystemComponent);
+		SetUpHandParticleSystemComponent(LeftHandParticleSystemComponent);
+		SetUpHandParticleSystemComponent(RightHandParticleSystemComponent);
 	}
-	leftHandParticleSystemComponent->RegisterComponent();
-	rightHandParticleSystemComponent->RegisterComponent();
+	LeftHandParticleSystemComponent->RegisterComponent();
+	RightHandParticleSystemComponent->RegisterComponent();
+	world = GetWorld();
 }
 
 void ABattleCharacter::OnConstruction(const FTransform& Transform)
@@ -38,14 +52,14 @@ void ABattleCharacter::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	AdjustMeshToSize();
 	if (HAND_PARTICLES) {
-		SetUpHandParticleSystemComponent(leftHandParticleSystemComponent);
-		SetUpHandParticleSystemComponent(rightHandParticleSystemComponent);
+		SetUpHandParticleSystemComponent(LeftHandParticleSystemComponent);
+		SetUpHandParticleSystemComponent(RightHandParticleSystemComponent);
 	}
 }
 
 void ABattleCharacter::InitHandParticleSystemComponent(UParticleSystemComponent*& handParticleSystemComponent, FName componentName, FName componentToAttachToName) {
 	handParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(componentName);
-	handParticleSystemComponent->AttachToComponent(meshComponent, FAttachmentTransformRules::KeepRelativeTransform, componentToAttachToName);
+	handParticleSystemComponent->AttachToComponent(MeshComponent, FAttachmentTransformRules::KeepRelativeTransform, componentToAttachToName);
 }
 
 void ABattleCharacter::SetUpHandParticleSystemComponent(UParticleSystemComponent* handParticleSystemComponent)
@@ -57,15 +71,48 @@ void ABattleCharacter::SetUpHandParticleSystemComponent(UParticleSystemComponent
 }
 
 void ABattleCharacter::AdjustMeshToSize() {
-	if (meshComponent) {
+	if (MeshComponent) {
 		FVector currentLocation = GetActorLocation();
 		SetActorLocation(FVector(currentLocation.X, currentLocation.Y, MESH_HEIGHT / 2));
 		FVector meshLocation = FVector(0.0f, 0.0f, -MESH_HEIGHT / 2);
-		meshComponent->SetRelativeLocation(meshLocation);
+		MeshComponent->SetRelativeLocation(meshLocation);
 		UCapsuleComponent* capsuleComponent = GetCapsuleComponent();
 		if (capsuleComponent) {
 			capsuleComponent->SetCapsuleHalfHeight(MESH_HEIGHT / 2);
 			capsuleComponent->SetCapsuleRadius(MESH_RADIUS);
 		}
 	}
+}
+
+void ABattleCharacter::HitByAttack(AAttack* attack)
+{
+	UpdateHealth(-attack->GetDamage());
+	attack->Die();
+}
+
+void ABattleCharacter::UpdateHealth(int healthChange)
+{
+	currentHealth += healthChange;
+	currentHealth = FMath::Clamp(currentHealth, 0, TOTAL_HEALTH);
+	if (updateHealthCallback) {
+		updateHealthCallback(currentHealth, TOTAL_HEALTH);
+	}
+}
+
+void ABattleCharacter::OnMeshBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("OVERLAP MESH"));
+	if (otherActor->IsA(AAttack::StaticClass())) {
+		UE_LOG(LogTemp, Warning, TEXT("OVERLAP PROJECTILE"));
+		AAttack* attack = (AAttack*)otherActor;
+		if (attack->GetTargetCharacter() == this) {
+			HitByAttack(attack);
+		}
+	}
+}
+
+void ABattleCharacter::Attack()
+{
+	AAttack* attack = world->SpawnActor<AAttack>(ATTACK);
+	attack->Init(this, opponent);
 }

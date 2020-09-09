@@ -7,6 +7,9 @@
 #include "Particles/ParticleSystem.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Engine/SkeletalMesh.h"
+#include <functional>
+#include "Attack.h"
+#include "Engine/World.h"
 #include "BattleCharacter.generated.h"
 
 UCLASS()
@@ -14,28 +17,42 @@ class DARKMAGIC_API ABattleCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+public:
+	void Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback);
+
 protected:
 	ABattleCharacter();
 	virtual void BeginPlay() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
-public:
+	virtual void Attack();
+	UWorld* world;
+
+private:
 	UPROPERTY(EditAnywhere)
 	int TOTAL_HEALTH = 1000;
-private:
 	UPROPERTY(EditAnywhere)
 	int MESH_HEIGHT = 250;
 	UPROPERTY(EditAnywhere)
 	int MESH_RADIUS = 40;
 	UPROPERTY(EditAnywhere)
 	UParticleSystem* HAND_PARTICLES;
-	UParticleSystemComponent* leftHandParticleSystemComponent;
-	UParticleSystemComponent* rightHandParticleSystemComponent;
+	UParticleSystemComponent* LeftHandParticleSystemComponent;
+	UParticleSystemComponent* RightHandParticleSystemComponent;
 	UPROPERTY(EditAnywhere)
 	float HAND_PARTICLE_SCALE = 1.0f;
 	UPROPERTY(EditAnywhere)
 	FVector HAND_PARTICLE_LOCATION;
 	void InitHandParticleSystemComponent(UParticleSystemComponent*& handParticleSystemComponent, FName componentName, FName componentToAttachToName);
 	void SetUpHandParticleSystemComponent(UParticleSystemComponent* handParticleSystemComponent);
-	USkeletalMeshComponent* meshComponent;
+	USkeletalMeshComponent* MeshComponent;
 	void AdjustMeshToSize();
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AAttack> ATTACK;
+	ABattleCharacter* opponent;
+	UFUNCTION()
+	void OnMeshBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult);
+	void HitByAttack(AAttack* attack);
+	void UpdateHealth(int healthChange);
+	std::function<void(int, int)> updateHealthCallback;
+	int currentHealth;
 };

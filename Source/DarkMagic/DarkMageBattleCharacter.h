@@ -14,10 +14,14 @@ UCLASS()
 class DARKMAGIC_API ADarkMageBattleCharacter : public ABattleCharacter
 {
 	GENERATED_BODY()
+
+public:
+	void Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback, std::function<void(int)> initArrowCallback);
+	virtual void Attack() override;
+	std::function<void(int)> arrowCallback;
+
 private:
 	ADarkMageBattleCharacter();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void ArrowCallbackFunction(int i);
-public:
-	std::function<void(int)> arrowCallback;
 };

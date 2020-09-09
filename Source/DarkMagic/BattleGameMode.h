@@ -15,7 +15,6 @@
 #include "EnemyBattleCharacter.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
-#include "Projectile.h"
 #include "BattleGameMode.generated.h"
 
 /**
@@ -28,64 +27,54 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 	private:
 		virtual void StartPlay() override;
 
-		//UI
+		//World Logic
+		UWorld* world;
+		void FindWorld();
+
+		//Battle Logic
+		ADarkMageBattleCharacter* player;
+		AEnemyBattleCharacter* enemy;
+		void FindPlayer();
+		void FindEnemy();
+		void InitPlayer();
+		void InitEnemy();
+		void PlayerAttack();
+
+		//UI HUD
+		UPROPERTY(EditAnywhere)
+		UClass* BATTLE_HUD;
+		void FindHUD();
+
+		//UI ARROWS
+		UPROPERTY(EditAnywhere)
+			TArray<UTexture2D*> ARROW_TEXTURES;
+		UPROPERTY(EditAnywhere)
+			TArray<UTexture2D*> ARROW_PRESSED_TEXTURES;
+		UPROPERTY(EditAnywhere)
+			int ARROW_COMMANDS_SIZE;
+		UPROPERTY(EditAnywhere)
+			float ARROW_SCALE;
+		UPROPERTY(EditAnywhere)
+			float ARROW_PADDING;
+		UPROPERTY(EditAnywhere)
+			float RESET_ARROW_TIMER_DURATION;
 		UHorizontalBox* arrowBox;
 		TArray<int> arrowCommands;
 		TArray<UImage*> arrowCommandImages;
 		int currentArrowCommandIndex;
 		UImage* InitArrowImage(int arrowIndex);
-		FTimerHandle resetArrowTimerHandle;
-		void InitHUD();
 		void SetUpArrowCommands(bool initiateArrowImages);
 		void AddArrowImageToBox(UImage* arrowImage);
 		void AdjustImageToTexture(UImage* arrowImage, UTexture2D* arrowTexture);
 		void IncorrectArrowPressed();
+		FTimerHandle resetArrowTimerHandle;
 		int RESETTING_ARROW_INDEX = 1000;
+		void PressedArrow(int arrowIndex);
+
+		//UI HEALTH
 		UProgressBar* playerHealthBar;
 		UProgressBar* enemyHealthBar;
 		UTextBlock* playerHealthText;
 		UTextBlock* enemyHealthText;
-		void UpdateHealthUI();
-
-		//World Logic
-		UWorld* world;
-		void InitWorld();
-
-		//Battle Logic
-		ADarkMageBattleCharacter* player;
-		AEnemyBattleCharacter* enemy;
-		void InitPlayer();
-		void InitEnemy();
-		void PlayerAttack();
-		void EnemyAttack();
-		void DamagePlayer(int damage);
-		void DamageEnemy(int damage);
-		int playerHealth;
-		int enemyHealth;
-		int PLAYER_TOTAL_HEALTH;
-		int ENEMY_TOTAL_HEALTH;
-		UPROPERTY(EditAnywhere)
-		TSubclassOf<AProjectile> PLAYER_PROJECTILE;
-		UPROPERTY(EditAnywhere)
-		TSubclassOf<AProjectile> ENEMY_PROJECTILE;
-		FTimerHandle enemyAttackTimerHandle;
-		UPROPERTY(EditAnywhere)
-		float ENEMY_ATTACK_TIMER_DURATION = 5.0f;
-
-	public:
-		void PressedArrow(int arrowIndex);
-		UPROPERTY(EditAnywhere)
-		UClass* BATTLE_HUD;
-		UPROPERTY(EditAnywhere)
-		TArray<UTexture2D*> ARROW_TEXTURES;
-		UPROPERTY(EditAnywhere)
-		TArray<UTexture2D*> ARROW_PRESSED_TEXTURES;
-		UPROPERTY(EditAnywhere)
-		int ARROW_COMMANDS_SIZE;
-		UPROPERTY(EditAnywhere)
-		float ARROW_SCALE;
-		UPROPERTY(EditAnywhere)
-		float ARROW_PADDING;
-		UPROPERTY(EditAnywhere)
-		float RESET_ARROW_TIMER_DURATION;
+		void UpdateHealthUI(ABattleCharacter* battleCharacter, int currentHealth, int totalHealth);
 };
