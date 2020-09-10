@@ -11,7 +11,7 @@
 #include "Containers/Array.h"
 #include "Blueprint/UserWidget.h"
 #include <functional>
-#include "DarkMageBattleCharacter.h"
+#include "PlayerBattleCharacter.h"
 #include "EnemyBattleCharacter.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
@@ -32,7 +32,7 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 		void FindWorld();
 
 		//Battle Logic
-		ADarkMageBattleCharacter* player;
+		APlayerBattleCharacter* player;
 		AEnemyBattleCharacter* enemy;
 		void FindPlayer();
 		void FindEnemy();

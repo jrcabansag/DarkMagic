@@ -9,15 +9,15 @@
 // Sets default values
 AAttack::AAttack()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	//PrimaryActorTick.bCanEverTick = true;
+	RootComponent = CreateDefaultSubobject<USceneComponent>(FName("RootComponent"));
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(FName("MeshComponent"));
-	SetRootComponent(MeshComponent);
+	MeshComponent->SetupAttachment(RootComponent);
 	MeshComponent->SetCollisionProfileName(TEXT("OverlapAll"));
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(FName("ProjectileMovementComponent"));
 	ProjectileMovementComponent->ProjectileGravityScale = 0.0f;
-	ProjectileMovementComponent->InitialSpeed = PROJECTILE_SPEED;
-	ProjectileMovementComponent->MaxSpeed = PROJECTILE_SPEED;
+	SetSpeed();
 }
 
 void AAttack::Init(ABattleCharacter* initSpawnCharacter, ABattleCharacter* initTargetCharacter)
@@ -58,5 +58,17 @@ int AAttack::GetDamage()
 void AAttack::Die()
 {
 	Destroy();
+}
+
+void AAttack::SetSpeed()
+{
+	ProjectileMovementComponent->InitialSpeed = PROJECTILE_SPEED;
+	ProjectileMovementComponent->MaxSpeed = PROJECTILE_SPEED;
+}
+
+void AAttack::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	SetSpeed();
 }
 

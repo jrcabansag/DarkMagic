@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include <functional>
 #include "BattleCharacter.h"
-#include "DarkMageBattleCharacter.generated.h"
+#include "PlayerBattleCharacter.generated.h"
 
 DECLARE_DELEGATE_OneParam(ArrowCallbackDelegate, int);
 
 class ABattleGameMode;
 UCLASS()
-class DARKMAGIC_API ADarkMageBattleCharacter : public ABattleCharacter
+class DARKMAGIC_API APlayerBattleCharacter : public ABattleCharacter
 {
 	GENERATED_BODY()
 
@@ -21,7 +21,7 @@ public:
 	std::function<void(int)> arrowCallback;
 
 private:
-	ADarkMageBattleCharacter();
+	APlayerBattleCharacter();
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	void ArrowCallbackFunction(int i);
 };

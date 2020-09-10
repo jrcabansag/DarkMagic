@@ -13,6 +13,7 @@ UCLASS()
 class DARKMAGIC_API AAttack : public AActor
 {
 	GENERATED_BODY()
+
 public:	
 	// Sets default values for this actor's properties
 	AAttack();
@@ -20,9 +21,12 @@ public:
 	ABattleCharacter* GetTargetCharacter();
 	int GetDamage();
 	void Die();
+
 private:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void OnConstruction(const FTransform& Transform) override;
+	void SetSpeed();
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* MeshComponent;
 	UPROPERTY(VisibleAnywhere)

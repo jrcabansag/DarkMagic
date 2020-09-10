@@ -42,7 +42,7 @@ void ABattleGameMode::FindHUD()
 
 void ABattleGameMode::FindPlayer()
 {
-    player = (ADarkMageBattleCharacter*)UGameplayStatics::GetPlayerCharacter(world, 0);
+    player = (APlayerBattleCharacter*)UGameplayStatics::GetPlayerCharacter(world, 0);
 }
 
 void ABattleGameMode::FindEnemy()
