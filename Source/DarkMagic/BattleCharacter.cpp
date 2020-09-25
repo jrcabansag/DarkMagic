@@ -15,9 +15,12 @@ ABattleCharacter::ABattleCharacter()
 	//PrimaryActorTick.bCanEverTick = true;
 	MeshComponent = GetMesh();
 	if (MeshComponent) {
-		MeshComponent->SetCollisionProfileName(TEXT("OverlapAll"));
-		MeshComponent->SetGenerateOverlapEvents(true);
-		MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ABattleCharacter::OnMeshBeginOverlap);
+		UCapsuleComponent* MyCapsuleComponent = GetCapsuleComponent();
+		if (MyCapsuleComponent) {
+			MyCapsuleComponent->SetCollisionProfileName(TEXT("OverlapAll"));
+			MyCapsuleComponent->SetGenerateOverlapEvents(true);
+			MyCapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &ABattleCharacter::OnBeginOverlap);
+		}
 		InitHandParticleSystemComponent(LeftHandParticleSystemComponent, FName("LeftHandParticles"), FName("LowerHand_L"));
 		InitHandParticleSystemComponent(RightHandParticleSystemComponent, FName("RightHandParticles"), FName("LowerHand_R"));
 		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
@@ -99,7 +102,7 @@ void ABattleCharacter::UpdateHealth(int healthChange)
 	}
 }
 
-void ABattleCharacter::OnMeshBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult)
+void ABattleCharacter::OnBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("OVERLAP MESH"));
 	if (otherActor->IsA(AAttack::StaticClass())) {
@@ -113,6 +116,12 @@ void ABattleCharacter::OnMeshBeginOverlap(UPrimitiveComponent* overlappedComp, A
 
 void ABattleCharacter::Attack()
 {
+	//GEngine->AddOnScreenDebugMessage(-1, 4.5f, FColor::Orange, __FUNCTION__);
 	AAttack* attack = world->SpawnActor<AAttack>(ATTACK);
 	attack->Init(this, opponent);
+}
+
+void ABattleCharacter::NotifyToAttack()
+{
+	Attack();
 }

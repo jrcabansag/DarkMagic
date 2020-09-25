@@ -19,12 +19,13 @@ class DARKMAGIC_API ABattleCharacter : public ACharacter
 
 public:
 	void Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback);
+	void NotifyToAttack();
 
 protected:
 	ABattleCharacter();
+	virtual void Attack();
 	virtual void BeginPlay() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
-	virtual void Attack();
 	UWorld* world;
 
 private:
@@ -50,7 +51,7 @@ private:
 	TSubclassOf<AAttack> ATTACK;
 	ABattleCharacter* opponent;
 	UFUNCTION()
-	void OnMeshBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult);
+	void OnBeginOverlap(UPrimitiveComponent* overlappedComp, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex, bool bFromSweep, const FHitResult& sweepResult);
 	void HitByAttack(AAttack* attack);
 	void UpdateHealth(int healthChange);
 	std::function<void(int, int)> updateHealthCallback;
