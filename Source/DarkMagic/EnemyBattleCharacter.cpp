@@ -6,7 +6,7 @@
 void AEnemyBattleCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	FTimerDelegate attackTimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemyBattleCharacter::Attack);
+	FTimerDelegate attackTimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemyBattleCharacter::SpawnAttack);
 	world->GetTimerManager().SetTimer(attackTimerHandle, attackTimerDelegate, ATTACK_TIMER_DURATION, true);
 }
 

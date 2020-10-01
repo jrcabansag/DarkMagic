@@ -19,16 +19,22 @@ class DARKMAGIC_API ABattleCharacter : public ACharacter
 
 public:
 	void Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback);
-	void NotifyToAttack();
+	void NotifyToSpawnAttack();
+	void NotifyToPauseAttack();
+	virtual void ShootAttack();
+	virtual void StopAttack();
 
 protected:
 	ABattleCharacter();
-	virtual void Attack();
+	virtual void StartAttack();
+	virtual void SpawnAttack();
 	virtual void BeginPlay() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 	UWorld* world;
 
 private:
+	UAnimInstance* animInstance;
+	UAnimMontage* animMontage;
 	UPROPERTY(EditAnywhere)
 	int TOTAL_HEALTH = 1000;
 	UPROPERTY(EditAnywhere)
@@ -56,4 +62,6 @@ private:
 	void UpdateHealth(int healthChange);
 	std::function<void(int, int)> updateHealthCallback;
 	int currentHealth;
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* STANCE_ANIM_MONTAGE;
 };

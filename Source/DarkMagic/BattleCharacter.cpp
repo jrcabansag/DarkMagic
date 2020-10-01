@@ -48,6 +48,11 @@ void ABattleCharacter::BeginPlay()
 	LeftHandParticleSystemComponent->RegisterComponent();
 	RightHandParticleSystemComponent->RegisterComponent();
 	world = GetWorld();
+	animInstance = MeshComponent->GetAnimInstance();
+	animMontage = ((AAttack*)ATTACK->GetDefaultObject())->GetAnimMontage();
+	if (STANCE_ANIM_MONTAGE) {
+		animInstance->Montage_Play(STANCE_ANIM_MONTAGE);
+	}
 }
 
 void ABattleCharacter::OnConstruction(const FTransform& Transform)
@@ -114,14 +119,43 @@ void ABattleCharacter::OnBeginOverlap(UPrimitiveComponent* overlappedComp, AActo
 	}
 }
 
-void ABattleCharacter::Attack()
+void ABattleCharacter::StartAttack()
+{
+	if (animInstance) {
+		if (animMontage) {
+			animInstance->Montage_Play(animMontage, 1.0f);
+		}
+	}
+}
+
+void ABattleCharacter::ShootAttack()
+{
+	if (animInstance->Montage_IsPlaying(animMontage)) {
+		animInstance->Montage_JumpToSection(FName("Shoot"), animMontage);
+	}
+	else {
+		animInstance->Montage_Resume(animMontage);
+	}
+}
+
+void ABattleCharacter::SpawnAttack()
 {
 	//GEngine->AddOnScreenDebugMessage(-1, 4.5f, FColor::Orange, __FUNCTION__);
 	AAttack* attack = world->SpawnActor<AAttack>(ATTACK);
 	attack->Init(this, opponent);
 }
 
-void ABattleCharacter::NotifyToAttack()
+void ABattleCharacter::NotifyToSpawnAttack()
 {
-	Attack();
+	SpawnAttack();
+}
+
+void ABattleCharacter::NotifyToPauseAttack()
+{
+	animInstance->Montage_Pause(animMontage);
+}
+
+void ABattleCharacter::StopAttack()
+{
+	animInstance->Montage_Stop(0.3f, animMontage);
 }

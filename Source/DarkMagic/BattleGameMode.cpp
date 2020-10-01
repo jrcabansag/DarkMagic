@@ -91,7 +91,7 @@ void ABattleGameMode::UpdateHealthUI(ABattleCharacter* battleCharacter, int curr
 void ABattleGameMode::PlayerAttack() {
     UE_LOG(LogTemp, Warning, TEXT("PLAYER ATTACKING!!!!!!!!!!!!!!!!!!!"));
     currentArrowCommandIndex = RESETTING_ARROW_INDEX;
-    player->Attack();
+    player->ShootAttack();
 }
 
 UImage* ABattleGameMode::InitArrowImage(int arrowIndex) {
@@ -136,6 +136,9 @@ void ABattleGameMode::PressedArrow(int arrowIndex) {
                 //UE_LOG(LogTemp, Warning, TEXT("GOT ARROW TEXTURE"), arrowIndex);
                 AdjustImageToTexture(arrowImage, arrowTexture);
                 currentArrowCommandIndex++;
+                if (isWildcard) {
+                    player->StartAttack();
+                }
             } else {
                 IncorrectArrowPressed();
                 return;
@@ -176,5 +179,6 @@ void ABattleGameMode::IncorrectArrowPressed() {
         AdjustImageToTexture(arrowImage, arrowTexture);
     }
     currentArrowCommandIndex = 0;
+    player->StopAttack();
 }
 

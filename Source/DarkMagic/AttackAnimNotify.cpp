@@ -9,6 +9,11 @@ void UAttackAnimNotify::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBa
 	GEngine->AddOnScreenDebugMessage(-1, 4.5f, FColor::Orange, __FUNCTION__);
 	ABattleCharacter* battleCharacter = (ABattleCharacter*)(MeshComp->GetOwner());
 	if (battleCharacter != nullptr && battleCharacter->HasActorBegunPlay()) {
-		battleCharacter->NotifyToAttack();
+		if (NOTIFY_STATE == 0) {
+			battleCharacter->NotifyToPauseAttack();
+		}
+		else {
+			battleCharacter->NotifyToSpawnAttack();
+		}
 	}
 }

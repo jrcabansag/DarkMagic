@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include <functional>
+#include "Animation/AnimMontage.h"
 #include "Attack.generated.h"
 
 class ABattleCharacter;
@@ -20,6 +21,7 @@ public:
 	void Init(ABattleCharacter* initSpawnCharacter, ABattleCharacter* initTargetCharacter);
 	ABattleCharacter* GetTargetCharacter();
 	int GetDamage();
+	UAnimMontage* GetAnimMontage();
 	void Die();
 
 private:
@@ -39,4 +41,6 @@ private:
 	int DAMAGE = 100;
 	UPROPERTY(EditAnywhere)
 	int PROJECTILE_SPEED = 1500;
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* animMontage;
 };

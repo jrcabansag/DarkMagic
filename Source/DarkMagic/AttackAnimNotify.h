@@ -16,5 +16,8 @@ class DARKMAGIC_API UAttackAnimNotify : public UAnimNotify
 
 public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation) override;
-	
+
+private:
+	UPROPERTY(EditAnywhere)
+		int NOTIFY_STATE;
 };

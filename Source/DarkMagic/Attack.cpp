@@ -72,3 +72,8 @@ void AAttack::OnConstruction(const FTransform& Transform)
 	SetSpeed();
 }
 
+UAnimMontage* AAttack::GetAnimMontage()
+{
+	return animMontage;
+}
+

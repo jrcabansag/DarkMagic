@@ -32,7 +32,7 @@ void APlayerBattleCharacter::ArrowCallbackFunction(int i)
 	}
 }
 
-void APlayerBattleCharacter::Attack()
+void APlayerBattleCharacter::StartAttack()
 {
-	Super::Attack();
+	Super::StartAttack();
 }
