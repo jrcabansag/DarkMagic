@@ -29,18 +29,18 @@ private:
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 	void SetSpeed();
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category="Projectile Properties")
 	UStaticMeshComponent* MeshComponent;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Projectile Properties")
 	UProjectileMovementComponent* ProjectileMovementComponent;
 	ABattleCharacter* spawnCharacter;
 	ABattleCharacter* targetCharacter;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
 	FVector SPAWN_OFFSET;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
 	int DAMAGE = 100;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
 	int PROJECTILE_SPEED = 1500;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
 	UAnimMontage* animMontage;
 };

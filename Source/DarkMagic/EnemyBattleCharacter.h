@@ -17,9 +17,15 @@ class DARKMAGIC_API AEnemyBattleCharacter : public ABattleCharacter
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void StartAttack() override;
+	virtual void ShootAttack() override;
 
 private:
 	FTimerHandle attackTimerHandle;
-	UPROPERTY()
-		float ATTACK_TIMER_DURATION = 5.0f;
+	UPROPERTY(EditAnywhere, Category="Enemy AI Properties")
+		float SHOOT_ATTACK_TIME = 4.0f;
+	UPROPERTY(EditAnywhere, Category = "Enemy AI Properties")
+		float CHOOSE_ATTACK_TIME = 2.0f;
+	UPROPERTY(EditAnywhere, Category = "Enemy AI Properties")
+		float BATTLE_START_WAITING_TIME = 5.0f;
 };

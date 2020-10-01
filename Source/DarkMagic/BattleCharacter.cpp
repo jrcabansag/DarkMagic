@@ -140,7 +140,6 @@ void ABattleCharacter::ShootAttack()
 
 void ABattleCharacter::SpawnAttack()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 4.5f, FColor::Orange, __FUNCTION__);
 	AAttack* attack = world->SpawnActor<AAttack>(ATTACK);
 	attack->Init(this, opponent);
 }

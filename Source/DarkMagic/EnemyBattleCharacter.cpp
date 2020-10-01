@@ -6,7 +6,20 @@
 void AEnemyBattleCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	FTimerDelegate attackTimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemyBattleCharacter::SpawnAttack);
-	world->GetTimerManager().SetTimer(attackTimerHandle, attackTimerDelegate, ATTACK_TIMER_DURATION, true);
+	FTimerDelegate startAttackTimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemyBattleCharacter::StartAttack);
+	world->GetTimerManager().SetTimer(attackTimerHandle, startAttackTimerDelegate, BATTLE_START_WAITING_TIME, false);
 }
 
+void AEnemyBattleCharacter::StartAttack()
+{
+	Super::StartAttack();
+	FTimerDelegate shootAttackTimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemyBattleCharacter::ShootAttack);
+	world->GetTimerManager().SetTimer(attackTimerHandle, shootAttackTimerDelegate, SHOOT_ATTACK_TIME, false);
+}
+
+void AEnemyBattleCharacter::ShootAttack()
+{
+	Super::ShootAttack();
+	FTimerDelegate startAttackTimerDelegate = FTimerDelegate::CreateUObject(this, &AEnemyBattleCharacter::StartAttack);
+	world->GetTimerManager().SetTimer(attackTimerHandle, startAttackTimerDelegate, CHOOSE_ATTACK_TIME, false);
+}

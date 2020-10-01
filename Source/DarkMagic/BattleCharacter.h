@@ -19,8 +19,8 @@ class DARKMAGIC_API ABattleCharacter : public ACharacter
 
 public:
 	void Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback);
-	void NotifyToSpawnAttack();
-	void NotifyToPauseAttack();
+	virtual void NotifyToSpawnAttack();
+	virtual void NotifyToPauseAttack();
 	virtual void ShootAttack();
 	virtual void StopAttack();
 

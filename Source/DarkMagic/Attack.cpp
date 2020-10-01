@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "UObject/Object.h"
 #include "BattleCharacter.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AAttack::AAttack()
@@ -27,8 +28,18 @@ void AAttack::Init(ABattleCharacter* initSpawnCharacter, ABattleCharacter* initT
 	FVector spawnCharacterLocation = spawnCharacter->GetActorLocation();
 	SetActorLocation(spawnCharacterLocation + SPAWN_OFFSET);
 	FVector targetCharacterLocation = targetCharacter->GetActorLocation();
-	FVector velocity = targetCharacterLocation-spawnCharacterLocation;
-	ProjectileMovementComponent->SetVelocityInLocalSpace(PROJECTILE_SPEED*velocity.GetSafeNormal(1.0f));
+	FVector difference = targetCharacterLocation - spawnCharacterLocation;
+	difference.Normalize();
+	float attackRotation = UKismetMathLibrary::DegAcos(difference.X);
+	if (difference.Z < 0) {
+		attackRotation = 360.0f - attackRotation;
+	}
+	FRotator attackRotator = FRotator(attackRotation, 0.0f, 0.0f);
+	UE_LOG(LogTemp, Warning, TEXT("ACOS IS %lf"), attackRotation);
+	/*FVector attackRotation = UKismetMathLibrary::FindLookAtRotation(spawnCharacterLocation, targetCharacterLocation).Vector();*/
+	SetActorRotation(attackRotator);
+	FVector velocityDirection = FVector(1.0f, 0.0f, 0.0f);
+	ProjectileMovementComponent->SetVelocityInLocalSpace(PROJECTILE_SPEED*velocityDirection);
 }
 
 // Called when the game starts or when spawned
