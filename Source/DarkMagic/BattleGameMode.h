@@ -15,6 +15,9 @@
 #include "EnemyBattleCharacter.h"
 #include "Engine/World.h"
 #include "TimerManager.h"
+#include "DamageText.h"
+#include "DamageTextWidget.h"
+#include "Components/WidgetComponent.h"
 #include "BattleGameMode.generated.h"
 
 /**
@@ -77,4 +80,7 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 		UTextBlock* playerHealthText;
 		UTextBlock* enemyHealthText;
 		void UpdateHealthUI(ABattleCharacter* battleCharacter, int currentHealth, int totalHealth);
+		UPROPERTY(EditAnywhere)
+		TSubclassOf<ADamageText> DAMAGE_TEXT;
+		void SpawnDamageText(int damage, ABattleCharacter* damagedCharacter);
 };

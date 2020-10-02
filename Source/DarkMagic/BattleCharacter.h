@@ -18,7 +18,7 @@ class DARKMAGIC_API ABattleCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	void Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback);
+	void Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback, std::function<void(int)> initHitCallback);
 	virtual void NotifyToSpawnAttack();
 	virtual void NotifyToPauseAttack();
 	virtual void ShootAttack();
@@ -61,6 +61,7 @@ private:
 	void HitByAttack(AAttack* attack);
 	void UpdateHealth(int healthChange);
 	std::function<void(int, int)> updateHealthCallback;
+	std::function<void(int)> hitCallback;
 	int currentHealth;
 	UPROPERTY(EditAnywhere, Category = "Battle Character Properties")
 	UAnimMontage* STANCE_ANIM_MONTAGE;

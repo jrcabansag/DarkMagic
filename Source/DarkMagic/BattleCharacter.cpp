@@ -28,13 +28,14 @@ ABattleCharacter::ABattleCharacter()
 	currentHealth = TOTAL_HEALTH;
 }
 
-void ABattleCharacter::Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback)
+void ABattleCharacter::Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback, std::function<void(int)> initHitCallback)
 {
 	opponent = initOpponent;
 	updateHealthCallback = initUpdateHealthCallback;
 	if (updateHealthCallback) {
 		updateHealthCallback(currentHealth, TOTAL_HEALTH);
 	}
+	hitCallback = initHitCallback;
 }
 
 // Called when the game starts or when spawned
@@ -97,6 +98,9 @@ void ABattleCharacter::HitByAttack(AAttack* attack)
 	UpdateHealth(-attack->GetDamage());
 	if (HIT_ANIM_MONTAGE) {
 		animInstance->Montage_Play(HIT_ANIM_MONTAGE);
+	}
+	if (hitCallback) {
+		hitCallback(attack->GetDamage());
 	}
 	attack->Die();
 }

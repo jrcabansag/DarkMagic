@@ -16,7 +16,7 @@ class DARKMAGIC_API APlayerBattleCharacter : public ABattleCharacter
 	GENERATED_BODY()
 
 public:
-	void Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback, std::function<void(int)> initArrowCallback);
+	void Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback, std::function<void(int)> initArrowCallback, std::function<void(int)> initHitCallback);
 	virtual void StartAttack() override;
 	std::function<void(int)> arrowCallback;
 

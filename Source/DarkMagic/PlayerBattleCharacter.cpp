@@ -8,9 +8,9 @@ APlayerBattleCharacter::APlayerBattleCharacter()
 	AutoPossessPlayer = EAutoReceiveInput::Player0;
 }
 
-void APlayerBattleCharacter::Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback, std::function<void(int)> initArrowCallback)
+void APlayerBattleCharacter::Init(ABattleCharacter* initOpponent, std::function<void(int, int)> initUpdateHealthCallback, std::function<void(int)> initArrowCallback, std::function<void(int)> initHitCallback)
 {
-	Super::Init(initOpponent, initUpdateHealthCallback);
+	Super::Init(initOpponent, initUpdateHealthCallback, initHitCallback);
 	arrowCallback = initArrowCallback;
 }
 

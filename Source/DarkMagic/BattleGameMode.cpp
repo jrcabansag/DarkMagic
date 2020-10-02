@@ -64,7 +64,10 @@ void ABattleGameMode::InitPlayer()
         std::function<void(int)> playerArrowCallback = [this](int i) {
             PressedArrow(i);
         };
-        player->Init((ABattleCharacter*)enemy, playerUpdateHealthUI, playerArrowCallback);
+        std::function<void(int)> hitCallback = [this](int i) {
+            SpawnDamageText(i, (ABattleCharacter*)player);
+        };
+        player->Init((ABattleCharacter*)enemy, playerUpdateHealthUI, playerArrowCallback, hitCallback);
     }
 }
 
@@ -74,7 +77,10 @@ void ABattleGameMode::InitEnemy() {
         std::function<void(int, int)> enemyUpdateHealthUI = [this](int enemyCurrentHealth, int enemyTotalHealth) {
             UpdateHealthUI((ABattleCharacter*)enemy, enemyCurrentHealth, enemyTotalHealth);
         };
-        enemy->Init((ABattleCharacter*)player, enemyUpdateHealthUI);
+        std::function<void(int)> hitCallback = [this](int i) {
+            SpawnDamageText(i, (ABattleCharacter*)enemy);
+        };
+        enemy->Init((ABattleCharacter*)player, enemyUpdateHealthUI, hitCallback);
     }
 }
 
@@ -86,6 +92,21 @@ void ABattleGameMode::UpdateHealthUI(ABattleCharacter* battleCharacter, int curr
     UProgressBar* healthBar = isBattleCharacterPlayer ? playerHealthBar : enemyHealthBar;
     healthText->SetText(FText::FromString(healthString));
     healthBar->SetPercent(float(currentHealth) / float(totalHealth));
+}
+
+void ABattleGameMode::SpawnDamageText(int damage, ABattleCharacter* damagedCharacter)
+{
+    //UDamageTextWidget* damageTextWidget = CreateWidget<UDamageTextWidget>(this->GetGameInstance(), DAMAGE_TEXT_WIDGET);
+    //damageTextWidget->Init(damage);
+    //UWidgetComponent* widgetComponent = NewObject<UWidgetComponent>(UWidgetComponent::StaticClass(), UWidgetComponent::StaticClass(), FName("WidgetComponent"));
+    //damageTextWidget->SetPositionInViewport(FVector2D(100.f, 100.f));
+    //damageTextWidget->AddToViewport();
+    ADamageText* damageText = world->SpawnActor<ADamageText>(DAMAGE_TEXT);
+    damageText->Init(damage);
+    FVector damagedLocation = damagedCharacter->GetActorLocation();
+    damageText->SetActorLocation(FVector(0, 30.f, 150.f));
+    damageText->AttachToActor(damagedCharacter, FAttachmentTransformRules::KeepRelativeTransform, FName("Head"));
+    //damageText->SetActorLocation(damagedCharacter->GetActorLocation());
 }
 
 void ABattleGameMode::PlayerAttack() {
