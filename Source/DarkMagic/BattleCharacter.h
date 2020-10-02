@@ -35,25 +35,25 @@ protected:
 private:
 	UAnimInstance* animInstance;
 	UAnimMontage* animMontage;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Battle Character Properties")
 	int TOTAL_HEALTH = 1000;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Battle Character Properties")
 	int MESH_HEIGHT = 250;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Battle Character Properties")
 	int MESH_RADIUS = 40;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Battle Character Properties")
 	UParticleSystem* HAND_PARTICLES;
 	UParticleSystemComponent* LeftHandParticleSystemComponent;
 	UParticleSystemComponent* RightHandParticleSystemComponent;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Battle Character Properties")
 	float HAND_PARTICLE_SCALE = 1.0f;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Battle Character Properties")
 	FVector HAND_PARTICLE_LOCATION;
 	void InitHandParticleSystemComponent(UParticleSystemComponent*& handParticleSystemComponent, FName componentName, FName componentToAttachToName);
 	void SetUpHandParticleSystemComponent(UParticleSystemComponent* handParticleSystemComponent);
 	USkeletalMeshComponent* MeshComponent;
 	void AdjustMeshToSize();
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Battle Character Properties")
 	TSubclassOf<AAttack> ATTACK;
 	ABattleCharacter* opponent;
 	UFUNCTION()
@@ -62,6 +62,8 @@ private:
 	void UpdateHealth(int healthChange);
 	std::function<void(int, int)> updateHealthCallback;
 	int currentHealth;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Battle Character Properties")
 	UAnimMontage* STANCE_ANIM_MONTAGE;
+	UPROPERTY(EditAnywhere, Category = "Battle Character Properties")
+	UAnimMontage* HIT_ANIM_MONTAGE;
 };

@@ -95,6 +95,9 @@ void ABattleCharacter::AdjustMeshToSize() {
 void ABattleCharacter::HitByAttack(AAttack* attack)
 {
 	UpdateHealth(-attack->GetDamage());
+	if (HIT_ANIM_MONTAGE) {
+		animInstance->Montage_Play(HIT_ANIM_MONTAGE);
+	}
 	attack->Die();
 }
 
