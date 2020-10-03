@@ -25,6 +25,7 @@ public:
 	void Die();
 
 private:
+	int damage;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
@@ -38,7 +39,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
 	FVector SPAWN_OFFSET;
 	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
-	int DAMAGE = 100;
+	int MIN_DAMAGE = 100;
+	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
+	int MAX_DAMAGE = 100;
 	UPROPERTY(EditAnywhere, Category = "Projectile Properties")
 	int PROJECTILE_SPEED = 1500;
 	UPROPERTY(EditAnywhere, Category = "Projectile Properties")

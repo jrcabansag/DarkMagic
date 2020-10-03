@@ -6,6 +6,7 @@
 #include "UObject/Object.h"
 #include "BattleCharacter.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Math/UnrealMathUtility.h"
 
 // Sets default values
 AAttack::AAttack()
@@ -38,6 +39,7 @@ void AAttack::Init(ABattleCharacter* initSpawnCharacter, ABattleCharacter* initT
 	UE_LOG(LogTemp, Warning, TEXT("ACOS IS %lf"), attackRotation);
 	/*FVector attackRotation = UKismetMathLibrary::FindLookAtRotation(spawnCharacterLocation, targetCharacterLocation).Vector();*/
 	SetActorRotation(attackRotator);
+	damage = FMath::RandRange(MIN_DAMAGE, MAX_DAMAGE);
 	FVector velocityDirection = FVector(1.0f, 0.0f, 0.0f);
 	ProjectileMovementComponent->SetVelocityInLocalSpace(PROJECTILE_SPEED*velocityDirection);
 }
@@ -63,7 +65,7 @@ ABattleCharacter* AAttack::GetTargetCharacter()
 
 int AAttack::GetDamage()
 {
-	return DAMAGE;
+	return damage;
 }
 
 void AAttack::Die()
