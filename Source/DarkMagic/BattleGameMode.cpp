@@ -65,7 +65,7 @@ void ABattleGameMode::InitPlayer()
             PressedArrow(i);
         };
         std::function<void(int)> hitCallback = [this](int i) {
-            SpawnDamageText(i, (ABattleCharacter*)player);
+            SpawnDamageText(i, (ABattleCharacter*)player, FVector2D(0.7f, 0.7f));
         };
         player->Init((ABattleCharacter*)enemy, playerUpdateHealthUI, playerArrowCallback, hitCallback);
     }
@@ -78,7 +78,7 @@ void ABattleGameMode::InitEnemy() {
             UpdateHealthUI((ABattleCharacter*)enemy, enemyCurrentHealth, enemyTotalHealth);
         };
         std::function<void(int)> hitCallback = [this](int i) {
-            SpawnDamageText(i, (ABattleCharacter*)enemy);
+            SpawnDamageText(i, (ABattleCharacter*)enemy, FVector2D(1.0f, 1.0f));
         };
         enemy->Init((ABattleCharacter*)player, enemyUpdateHealthUI, hitCallback);
     }
@@ -94,7 +94,7 @@ void ABattleGameMode::UpdateHealthUI(ABattleCharacter* battleCharacter, int curr
     healthBar->SetPercent(float(currentHealth) / float(totalHealth));
 }
 
-void ABattleGameMode::SpawnDamageText(int damage, ABattleCharacter* damagedCharacter)
+void ABattleGameMode::SpawnDamageText(int damage, ABattleCharacter* damagedCharacter, FVector2D renderScale)
 {
     //UDamageTextWidget* damageTextWidget = CreateWidget<UDamageTextWidget>(this->GetGameInstance(), DAMAGE_TEXT_WIDGET);
     //damageTextWidget->Init(damage);
@@ -102,10 +102,10 @@ void ABattleGameMode::SpawnDamageText(int damage, ABattleCharacter* damagedChara
     //damageTextWidget->SetPositionInViewport(FVector2D(100.f, 100.f));
     //damageTextWidget->AddToViewport();
     ADamageText* damageText = world->SpawnActor<ADamageText>(DAMAGE_TEXT);
-    damageText->Init(damage);
+    damageText->Init(damage, renderScale);
     FVector damagedLocation = damagedCharacter->GetActorLocation();
-    damageText->SetActorLocation(FVector(0, 30.f, 150.f));
-    damageText->AttachToActor(damagedCharacter, FAttachmentTransformRules::KeepRelativeTransform, FName("Head"));
+    damageText->SetActorLocation(FVector(damagedLocation.X, damagedLocation.Y, damagedLocation.Z+100.f));
+    //damageText->AttachToActor(damagedCharacter, FAttachmentTransformRules::KeepRelativeTransform);
     //damageText->SetActorLocation(damagedCharacter->GetActorLocation());
 }
 

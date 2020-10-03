@@ -29,3 +29,8 @@ void UDamageTextWidget::Die()
 	dieCallback();
 	//RemoveFromViewport();
 }
+
+//FVector UDamageTextWidget::GetTextWorldLocation()
+//{
+//	return DamageText->GetWorldLocation();
+//}

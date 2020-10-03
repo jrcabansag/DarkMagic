@@ -3,6 +3,8 @@
 
 #include "DamageText.h"
 #include <functional>
+#include "kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ADamageText::ADamageText()
@@ -11,9 +13,10 @@ ADamageText::ADamageText()
 	PrimaryActorTick.bCanEverTick = true;
 	
 		WidgetComponent = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
-		WidgetComponent->SetWidgetSpace(EWidgetSpace::World);
+		WidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+		//WidgetComponent->SetWidgetSpace(EWidgetSpace::World);
 		WidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 0.0f));
-		WidgetComponent->SetDrawSize(FVector2D(1500.0f, 900.0f));
+		//WidgetComponent->SetDrawSize(FVector2D(1500.0f, 900.0f));
 		WidgetComponent->SetVisibility(false);
 }
 
@@ -38,16 +41,16 @@ void ADamageText::BeginPlay()
 	//}
 }
 
-void ADamageText::Init(int damage)
+void ADamageText::Init(int damage, FVector2D renderScale)
 {
 	if (DAMAGE_TEXT_WIDGET) {
-		SetActorRotation(FRotator(0.0f, 90.0f, 0.0f));
 		damageTextWidget = CreateWidget<UDamageTextWidget>(this->GetGameInstance(), DAMAGE_TEXT_WIDGET);
 		WidgetComponent->SetWidget(damageTextWidget);
 		std::function<void()> dieCallback = [this]() {
 			Destroy();
 		};
 		damageTextWidget->Init(damage, dieCallback);
+		damageTextWidget->SetRenderScale(renderScale);
 		WidgetComponent->RegisterComponent();
 		WidgetComponent->SetVisibility(true);
 	}
@@ -57,6 +60,8 @@ void ADamageText::Init(int damage)
 void ADamageText::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	FVector cameraLocation = UGameplayStatics::GetPlayerController(this, 0)->GetViewTarget()->GetActorLocation();
+	FRotator lookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), cameraLocation);
+	SetActorRotation(lookAtRotation);
 }
 

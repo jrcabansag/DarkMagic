@@ -28,4 +28,5 @@ public:
 	FTimerHandle damageTimerHandle;
 	void Die();
 	std::function<void()> dieCallback;
+	//FVector GetTextWorldLocation();
 };

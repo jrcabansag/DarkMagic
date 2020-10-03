@@ -24,7 +24,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	void Init(int damage);
+	void Init(int damage, FVector2D renderScale);
 
 private:
 	UPROPERTY(EditAnywhere)

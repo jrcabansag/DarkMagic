@@ -82,5 +82,5 @@ class DARKMAGIC_API ABattleGameMode : public AGameModeBase
 		void UpdateHealthUI(ABattleCharacter* battleCharacter, int currentHealth, int totalHealth);
 		UPROPERTY(EditAnywhere)
 		TSubclassOf<ADamageText> DAMAGE_TEXT;
-		void SpawnDamageText(int damage, ABattleCharacter* damagedCharacter);
+		void SpawnDamageText(int damage, ABattleCharacter* damagedCharacter, FVector2D renderScale);
 };
